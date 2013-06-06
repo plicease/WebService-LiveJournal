@@ -3,6 +3,7 @@ package WebService::LiveJournal;
 use strict;
 use warnings;
 use v5.10;
+use base qw( WebService::LiveJournal::Client );
 
 # ABSTRACT: Interface to the LiveJournal API via XML-RPC
 # VERSION
@@ -31,6 +32,12 @@ many many years with very little maintenance required, and at the time of
 its original writing the documentation for those modules was sparse or misleading.
 
 =cut
+
+sub _set_error
+{
+  my($self, $message) = @_;
+  die $message;
+}
 
 1;
 

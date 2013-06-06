@@ -150,16 +150,8 @@ sub new    # arg: server, port, username, password, mode
   return unless defined $response;
   
   my $h = $response->value;
-  if(defined $h->{faultString})
-  {
-    $error = $h->{faultString};
-    return;
-  }
-  if(defined $h->{faultCode})
-  {
-    $error = "unknown LJ error " . $h->{faultCode}->value;
-    return;
-  }
+  return $self->_set_error($h->{faultString}) if defined $h->{faultString};
+  return $self->_set_error("unknown LJ error " . $h->{faultCode}->value) if defined $h->{faultCode};
   
   $self->{userid} = $h->{userid};
   $self->{fullname} = $h->{fullname};
@@ -339,8 +331,7 @@ sub getevents
   {
     unless(defined $arg{day} && defined $arg{month} && defined $arg{year})
     {
-      $error = 'attempt to use selecttype=day without providing day!';
-      return;
+      return $self->_set_error('attempt to use selecttype=day without providing day!');
     }
     push  @list, 
       day   => new RPC::XML::int($arg{day}),
@@ -360,8 +351,7 @@ sub getevents
   }
   else
   {
-    $error = "unknown selecttype: $selecttype";
-    return;
+    return $self->_set_error("unknown selecttype: $selecttype");
   }
   
   push @list, truncate => new RPC::XML::int($arg{truncate}) if $arg{truncate};
@@ -437,8 +427,8 @@ C<$WebService::LiveJournal::Client::error> on error.
 
 sub send_request
 {
-  $error = undef;
   my $self = shift;
+  $self->_clear_error;
   my $count = $self->{count} || 1;
   my $procname = shift;
         
@@ -459,7 +449,7 @@ sub send_request
       {
         my $string = $response->value->{faultString};
         my $code = $response->value->{faultCode};
-        $error = "$string ($code) on LJ.XMLRPC.getchallenge";
+        $self->_set_error("$string ($code) on LJ.XMLRPC.getchallenge");
         return;
       }
       # else, stuff worked fall through 
@@ -475,8 +465,7 @@ sub send_request
         $self->{count} = $count;
         return $response;
       }
-      $error = $response;
-      return;
+      return $self->_set_error($response);
     }
 
     # this is where we fall through down to from above
@@ -516,7 +505,7 @@ sub send_request
     {
       my $string = $response->value->{faultString};
       my $code = $response->value->{faultCode};
-      $error = "$string ($code) on LJ.XMLRPC.$procname";
+      $self->_set_error("$string ($code) on LJ.XMLRPC.$procname");
       $error_request = $request;
       return;
     }
@@ -537,8 +526,7 @@ sub send_request
       $self->{count} = $count;
       return $response;
     }
-    $error = $response;
-    return;
+    return $self->_set_error($response);
   }
 }
 
@@ -553,11 +541,7 @@ sub _post
   #  print "$key=$arg{$key}\n";
   #}
   my $http_response = $ua->post($self->{flat_url}, \@_);
-  unless($http_response->is_success)
-  {
-    $error = "HTTP Error: " . $http_response->status_line;
-    return;
-  }
+  return $self->_set_error("HTTP Error: " . $http_response->status_line) unless $http_response->is_success;
   
   my $response_text = $http_response->content;
   my @list = split /\n/, $response_text;
@@ -571,18 +555,9 @@ sub _post
     $h{$key} = $value;
   }
   
-  unless(defined $h{success})
-  {
-    $error = "LJ Protocol error, server didn't return a success value";
-    return;
-  }
+  return $self->_set_error("LJ Protocol error, server didn't return a success value") unless defined $h{success};
+  return $self->_set_error("LJ Protocol error: $h{errmsg}") if $h{success} ne 'OK';
     
-  if($h{success} ne 'OK')
-  {
-    $error = "LJ Protocol error: $h{errmsg}";
-    return;
-  }
-  
   return \%h;
 }
 
@@ -686,8 +661,8 @@ C<$WebService::LiveJournal::Client::error> on error.
 
 sub send_flat_request
 {
-  $error = undef;
   my $self = shift;
+  $self->_clear_error;
   my $count = $self->{count} || 1;
   my $procname = shift;
   my $ua = $self->{client}->useragent;
@@ -715,6 +690,18 @@ sub send_flat_request
     @challenge,
     @_
   );
+}
+
+sub _set_error
+{
+  my($self, $value) = @_;
+  $error = $value;
+  return;
+}
+
+sub _clear_error
+{
+  undef $error;
 }
 
 1;
