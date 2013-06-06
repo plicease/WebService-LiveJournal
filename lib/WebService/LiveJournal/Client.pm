@@ -216,7 +216,7 @@ The username used to connect to LiveJournal
 The LiveJournal userid of the user used to connect to LiveJournal.
 This is an integer.
 
-=head2 $client-<gt>fullname
+=head2 $client-E<gt>fullname
 
 The fullname of the user used to connect to LiveJournal as LiveJournal understands it
 
@@ -763,8 +763,20 @@ its original writing the documentation for those modules was sparse or misleadin
 
 =head1 SEE ALSO
 
+=over 4
+
+=item
+
 L<http://www.livejournal.com/doc/server/index.html>,
+
+=item
+
 L<Net::LiveJournal>,
+
+=item
+
 L<LJ::Simple>
+
+=back
 
 =cut
