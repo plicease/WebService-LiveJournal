@@ -222,7 +222,11 @@ sub security
 
 =head2 $event-E<gt>allowmask
 
-FIXME
+Relevant when security is usemask. A 32-bit unsigned integer 
+representing which of the user's groups of friends are allowed 
+to view this post. Turn bit 0 on to allow any defined friend to
+read it. Otherwise, turn bit 1-30 on for every friend group that 
+should be allowed to read it. Bit 31 is reserved.
 
 =cut
 
@@ -250,13 +254,14 @@ URL for the LiveJournal event.
 
 Read only.
 
-The anum for the event.
-
-I am not really sure what this is for to be honest.
+The authentication number generated for this entry
+Probably best ignored.
 
 =head2 $event-E<gt>usejournal
 
-FIXME
+If editing a shared journal entry, include this key and the username
+you wish to edit the entry in. By default, you edit the entry as if
+it were in user "user"'s journal, as specified above.
 
 =cut
 

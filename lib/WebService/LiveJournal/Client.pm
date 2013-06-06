@@ -222,11 +222,11 @@ The fullname of the user used to connect to LiveJournal as LiveJournal understan
 
 =head2 $client-E<gt>usejournals
 
-FIXME document
+List of shared/news/community journals that the user has permission to post in.
 
 =head2 $client-E<gt>message
 
-FIXME document
+Message that should be displayed to the end user, if present.
 
 =head2 $client-E<gt>useragent
 
@@ -235,10 +235,6 @@ Instance of L<LWP::UserAgent> used to connect to LiveJournal
 =head2 $client-E<gt>cookie_jar
 
 Instance of L<HTTP::Cookies> used to connect to LiveJournal with
-
-=head2 $client-E<gt>usejournals
-
-FIXME document
 
 =cut
 
