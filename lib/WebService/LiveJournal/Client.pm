@@ -20,16 +20,39 @@ use constant DEBUG => 0;
 
 =head1 SYNOPSIS
 
+new interface
+
+ use WebService::LiveJournal;
+ my $client = WebService::LiveJournal->new( username => 'foo', password => 'bar' );
+
+same thing with the old interface
+
  use WebService::LiveJournal::Client;
- 
  my $client = WebService::LiveJournal::Client->new( username => 'foo', password => 'bar' );
  die "connection error: $WebService::LiveJournal::Client::error" unless defined $client;
 
 =head1 DESCRIPTION
 
-This is the client class for communicating with LiveJournal using its API.  It mostly
-uses the XML-RPC version of the API, but it can be configured to use the flat API
-in some circumstances to work around bugs in some LiveJournal servers.
+This is the client class for communicating with LiveJournal using its API.  It is different
+from the other LJ modules on CPAN in that it originally used the XML-RPC API.  It now
+uses a hybrid of the flat and XML-RPC API to avoid bugs in some LiveJournal deployments.
+
+There are two interfaces:
+
+=over 4
+
+=item L<WebService::LiveJournal>
+
+The new interface, where methods throw an exception on error.
+
+=item L<WebService::LiveJournal::Client>
+
+The legacy interface, where methods return undef on error and
+set $WebService::LiveJournal::Client::error
+
+=back
+
+It is recommended that for any new code that you use the new interface.
 
 =cut
 
@@ -47,10 +70,10 @@ $RPC::XML::ENCODING = 'utf-8';  # uh... and WHY??? is this a global???
 =head2 WebService::LiveJournal::Client->new( %options )
 
 Connects to a LiveJournal server using the host and user information
-provided by C<%options>.  Returns an instance of 
-WebService::LiveJournal::Client on success, returns undef and sets
-C<$WebService::LiveJournal::Client::error> to an appropriate message
-on failure.
+provided by C<%options>.
+
+Signals an error depending on the interface
+selected by throwing an exception or returning undef.
 
 =head3 options
 
@@ -240,7 +263,23 @@ C<%options> contains a hash of attribute key, value pairs for
 the new L<WebService::LiveJournal::Event>.  The only required
 attributes are C<subject> and C<event>, though you may set these
 values after the event is created as long as you set them
-before you try to C<update> the event.
+before you try to C<update> the event.  Thus this:
+
+ my $event = $client->create(
+   subject => 'a new title',
+   event => 'some content',
+ );
+ $event->update;
+
+is equivalent to this:
+
+ my $event = $client->create;
+ $event->subject('a new title');
+ $event->event('some content');
+ $event->update;
+
+This method signals an error depending on the interface
+selected by throwing an exception or returning undef.
 
 =cut
 
@@ -312,6 +351,9 @@ date of the format C<yyyy-mm-dd hh:mm:ss>
 
 =back
 
+This method signals an error depending on the interface
+selected by throwing an exception or returning undef.
+
 =cut
 
 sub getevents
@@ -376,6 +418,9 @@ sub getevents
 
 Given an C<itemid> (the internal LiveJournal identifier for an event).
 
+This method signals an error depending on the interface
+selected by throwing an exception or returning undef.
+
 =cut
 
 sub getevent
@@ -420,8 +465,8 @@ C<$procname> (the rpc procedure name) and C<@arguments>
 On success returns the appropriate L<RPC::XML> type
 (usually RPC::XML::struct).
 
-On error it returns undef and sets 
-C<$WebService::LiveJournal::Client::error> on error.
+This method signals an error depending on the interface
+selected by throwing an exception or returning undef.
 
 =cut
 
@@ -654,8 +699,8 @@ with the given C<$procname> (the rpc procedure name) and C<@arguments>.
 
 On success returns the appropriate response.
 
-On error it returns undef and sets 
-C<$WebService::LiveJournal::Client::error> on error.
+This method signals an error depending on the interface
+selected by throwing an exception or returning undef.
 
 =cut
 
@@ -706,8 +751,20 @@ sub _clear_error
 
 1;
 
+=head1 HISTORY
+
+The code in this distribution was written many years ago to sync my website
+with my LiveJournal.  It has some ugly warts and its interface was not well 
+planned or thought out, it has many omissions and contains much tat is apocryphal 
+(or at least wildly inaccurate), but it (possibly) scores over the older 
+LiveJournal modules on CPAN in that it has been used in production for 
+many many years with very little maintenance required, and at the time of 
+its original writing the documentation for those modules was sparse or misleading.
+
 =head1 SEE ALSO
 
-L<WebService::LiveJournal>
+L<http://www.livejournal.com/doc/server/index.html>,
+L<Net::LiveJournal>,
+L<LJ::Simple>
 
 =cut

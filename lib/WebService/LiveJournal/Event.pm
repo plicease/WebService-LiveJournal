@@ -282,7 +282,8 @@ the existing event on the LiveJournal server.
 
 Returns true on success.
 
-Returns false on failure and sets $WebService::liveJournal::Client::error
+This method signals an error depending on the interface
+selected by throwing an exception or returning undef.
 
 =cut
 
@@ -302,6 +303,9 @@ sub update
 =head2 $event-E<gt>delete
 
 Remove the event on the LiveJournal server.
+
+This method signals an error depending on the interface
+selected by throwing an exception or returning undef.
 
 =cut
 
@@ -583,3 +587,9 @@ sub eventtime
 }
 
 1;
+
+=head1 SEE ALSO
+
+L<WebService::LiveJournal>
+
+=cut

@@ -37,3 +37,9 @@ sub mask { $_[0]->{groupmask} }
 sub as_string { '[friend ' . $_[0]->{username} . ']' }
 
 1;
+
+=head1 SEE ALSO
+
+L<WebService::LiveJournal>,
+
+=cut

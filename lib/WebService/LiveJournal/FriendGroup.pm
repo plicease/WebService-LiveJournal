@@ -43,3 +43,9 @@ sub mask
 }
 
 1;
+
+=head1 SEE ALSO
+
+L<WebService::LiveJournal>,
+
+=cut

@@ -25,3 +25,9 @@ sub xml2hashref
 sub xml2hash { %{ xml2hashref(@_) } }
 
 1;
+
+=head1 SEE ALSO
+
+L<WebService::LiveJournal>,
+
+=cut

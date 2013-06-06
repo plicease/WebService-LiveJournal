@@ -72,6 +72,5 @@ sub as_string
 
 L<WebService::LiveJournal>,
 L<WebService::LiveJournal::Event>,
-L<WebService::LiveJournal::Client>
 
 =cut
