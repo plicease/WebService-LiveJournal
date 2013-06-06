@@ -1,12 +1,11 @@
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 11;
 
 use_ok "WebService::LiveJournal";
 use_ok "WebService::LiveJournal::Event";
 use_ok "WebService::LiveJournal::Client";
 use_ok "WebService::LiveJournal::List";
-use_ok "WebService::LiveJournal::Latest::Item";
 use_ok "WebService::LiveJournal::FriendGroupList";
 use_ok "WebService::LiveJournal::FriendGroup";
 use_ok "WebService::LiveJournal::FriendList";
