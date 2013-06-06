@@ -15,6 +15,24 @@ use HTTP::Cookies;
 use YAML::XS qw( Dump );
 use constant DEBUG => 0;
 
+# ABSTRACT: Interface to the LiveJournal API
+# VERSION
+
+=head1 SYNOPSIS
+
+ use WebService::LiveJournal::Client;
+ 
+ my $client = WebService::LiveJournal::Client->new( username => 'foo', password => 'bar' );
+ die "connection error: $WebService::LiveJournal::Client::error" unless defined $client;
+
+=head1 DESCRIPTION
+
+This is the client class for communicating with LiveJournal using its API.  It mostly
+uses the XML-RPC version of the API, but it can be configured to use the flat API
+in some circumstances to work around bugs in some LiveJournal servers.
+
+=cut
+
 my $zero = new RPC::XML::int(0);
 my $one = new RPC::XML::int(1);
 our $lineendings_unix = new RPC::XML::string('unix');
@@ -24,6 +42,44 @@ our $error_request;
 
 $RPC::XML::ENCODING = 'utf-8';  # uh... and WHY??? is this a global???
 
+=head1 CONSTRUCTOR
+
+=head2 WebService::LiveJournal::Client->new( %options )
+
+Connects to a LiveJournal server using the host and user information
+provided by C<%options>.  Returns an instance of 
+WebService::LiveJournal::Client on success, returns undef and sets
+$WebService::LiveJournal::Client::error to an appropriate message
+on failure.
+
+=head3 options
+
+=over 4
+
+=item server
+
+The server hostname, defaults to www.livejournal.com
+
+=item port
+
+The server port, defaults to 80
+
+=item username [required]
+
+The username to login as
+
+=item password [required]
+
+The password to login with
+
+=item mode
+
+One of eitehr C<cookie> or C<challenge>, defaults to C<cookie>.
+
+=back
+
+=cut
+
 sub new    # arg: server, port, username, password, mode
 {
   my $ob = shift;
@@ -32,7 +88,7 @@ sub new    # arg: server, port, username, password, mode
   
   my %arg = @_;
   
-  my $server = $self->{server} = $arg{server};
+  my $server = $self->{server} = $arg{server} // 'www.livejournal.com';
   my $domain = $server;
   $domain =~ s/^([A-Za-z0-9]+)//;
   $self->{domain} = $domain;
@@ -44,7 +100,7 @@ sub new    # arg: server, port, username, password, mode
   $client->useragent->cookie_jar($cookie_jar);
   $client->useragent->default_headers->push_header('X-LJ-Auth' => 'cookie');
 
-  $self->{mode} = $arg{mode} || 'cookie';  # can be cookie or challenge
+  $self->{mode} = $arg{mode} // 'cookie';  # can be cookie or challenge
 
   my $username = $self->{username} = $arg{username};
   my $password = $arg{password};
@@ -123,6 +179,63 @@ sub new    # arg: server, port, username, password, mode
   $self->{message} = $h->{message};
   return $self;
 }
+
+=head1 ATTRIBUTES
+
+=head2 $client-E<gt>server
+
+The name of the LiveJournal server
+
+=head2 $client-E<gt>port
+
+The port used to connect to LiveJournal with
+
+=head2 $client-E<gt>username
+
+The username used to connect to LiveJournal
+
+=head2 $client-E<gt>userid
+
+The LiveJournal userid of the user used to connect to LiveJournal.
+This is an integer.
+
+=head2 $client-<gt>fullname
+
+The fullname of the user used to connect to LiveJournal as LiveJournal understands it
+
+=head2 $client-E<gt>usejournals
+
+FIXME document
+
+=head2 $client-E<gt>message
+
+FIXME document
+
+=head2 $client-E<gt>useragent
+
+Instance of L<LWP::UserAgent> used to connect to LiveJournal
+
+=head2 $client-E<gt>cookie_jar
+
+Instance of L<HTTP::Cookies> used to connect to LiveJournal with
+
+=head2 $client-E<gt>usejournals
+
+FIXME document
+
+=cut
+
+sub server { $_[0]->{server} }
+sub username { $_[0]->{username} }
+sub port { $_[0]->{port} }
+sub userid { $_[0]->{userid} }
+sub fullname { $_[0]->{fullname} }
+sub usejournals { @{ $_[0]->{usejournals} } }
+sub fastserver { $_[0]->{fastserver} }
+sub cachefriendgroups { $_[0]->{cachefriendgroups} }
+sub message { $_[0]->{message} }
+sub useragent { $_[0]->{client}->useragent }
+sub cookie_jar { $_[0]->{cookie_jar} }
 
 sub set_cookie
 {
@@ -458,18 +571,6 @@ sub create
   $event;
 }
 
-sub server { $_[0]->{server} }
-sub username { $_[0]->{username} }
-sub port { $_[0]->{port} }
-sub userid { $_[0]->{userid} }
-sub fullname { $_[0]->{fullname} }
-sub usejournals { @{ $_[0]->{usejournals} } }
-sub fastserver { $_[0]->{fastserver} }
-sub cachefriendgroups { $_[0]->{cachefriendgroups} }
-sub message { $_[0]->{message} }
-sub useragent { $_[0]->{client}->useragent }
-sub cookie_jar { $_[0]->{cookie_jar} }
-
 sub toStr
 {
   my $self = shift;
@@ -514,3 +615,9 @@ sub findallitemid
 }
 
 1;
+
+=head1 SEE ALSO
+
+L<WebService::LiveJournal>
+
+=cut

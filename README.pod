@@ -8,6 +8,10 @@ WebService::LiveJournal - Interface to the LiveJournal API via XML-RPC
 
 version 0.01
 
+=head1 SEE ALSO
+
+L<WebService::LiveJournal::Client>
+
 =head1 AUTHOR
 
 Graham Ollis <plicease@cpan.org>

@@ -1,14 +1,16 @@
 use strict;
-use NX;
 use WebService::LiveJournal::Client;
 
+print "user: ";
+my $user = <STDIN>;
+chomp $user;
 print "pass: ";
 my $password = <STDIN>;
-chomp($password);
+chomp $password;
 
-my $client = new WebService::LiveJournal::Client(
+my $client = WebService::LiveJournal::Client->new(
 	server => 'www.livejournal.com',
-	username => 'plicease',
+	username => $user,
 	password => $password,
 );
 
@@ -26,5 +28,6 @@ if($client->fastserver)
 }
 else
 {
+        print "value = ", $client->fastserver, "\n";
 	print "slow server\n";
 }

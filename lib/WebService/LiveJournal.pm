@@ -8,3 +8,10 @@ use v5.10;
 # VERSION
 
 1;
+
+=head1 SEE ALSO
+
+L<WebService::LiveJournal::Client>
+
+=cut
+
