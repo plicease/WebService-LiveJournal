@@ -1,14 +1,22 @@
 use strict;
-use NX;
+use warnings;
 use WebService::LiveJournal::Client;
 
+print "WARNING WARNING WARNING\n";
+print "this will remove all entries in your LiveJournal account\n";
+print "this probably cannot be undone\n";
+print "WARNING WARNING WARNING\n";
+
+print "user: ";
+my $user = <STDIN>;
+chomp $user;
 print "pass: ";
 my $password = <STDIN>;
-chomp($password);
+chomp $password;
 
-my $client = new WebService::LiveJournal::Client(
-	server => 'www.greatestjournal.com',
-	username => 'plicease',
+my $client = WebService::LiveJournal::Client->new(
+	server => 'www.livejournal.com',
+	username => $user,
 	password => $password,
 );
 
@@ -19,16 +27,6 @@ unless(defined $client)
 }
 
 print "$client\n";
-
-if($client->fastserver)
-{
-	print "fast server\n";
-}
-else
-{
-	print "slow server\n";
-}
-
 
 my $count = 1;
 while($count > 0)
@@ -43,3 +41,5 @@ while($count > 0)
 		$count++;
 	}
 }
+
+print "$count entries deleted";
