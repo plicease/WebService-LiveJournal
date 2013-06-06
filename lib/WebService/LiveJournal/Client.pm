@@ -97,7 +97,7 @@ The password to login with
 
 =item mode
 
-One of eitehr C<cookie> or C<challenge>, defaults to C<cookie>.
+One of either C<cookie> or C<challenge>, defaults to C<cookie>.
 
 =back
 
