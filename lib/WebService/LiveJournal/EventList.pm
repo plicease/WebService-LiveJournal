@@ -26,13 +26,13 @@ sub init
   return $self;
 }
 
-sub toStr
+sub as_string
 {
   my $self = shift;
   my $str = '[eventlist ';
   foreach my $friend (@{ $self })
   {
-    $str .= $friend->toStr;
+    $str .= $friend->as_string;
   }
   $str .= ']';
   $str;

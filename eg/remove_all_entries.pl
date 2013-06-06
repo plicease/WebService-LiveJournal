@@ -28,18 +28,17 @@ unless(defined $client)
 
 print "$client\n";
 
-my $count = 1;
-while($count > 0)
+my $count = 0;
+while(1)
 {
-  $count = 0;
   my $event_list = $client->getevents('lastn', howmany => 50);
+  last unless @{ $event_list } > 0;
   foreach my $event (@{ $event_list })
   {
     print $event->subject, "\n";
-    $event->event('');	# setting the "event" or body to an entry to empty 
-    $event->update;		# string will delete it
+    $event->delete;
     $count++;
   }
 }
 
-print "$count entries deleted";
+print "$count entries deleted\n";

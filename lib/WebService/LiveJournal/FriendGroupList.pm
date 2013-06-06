@@ -22,13 +22,13 @@ sub init
   return $self;
 }
 
-sub toStr
+sub as_string
 {
   my $self = shift;
   my $str = "[friendgrouplist \n";
   foreach my $friend (@{ $self })
   {
-    $str .= "\t" . $friend->toStr . "\n";
+    $str .= "\t" . $friend->as_string . "\n";
   }
   $str .= ']';
   $str;

@@ -3,7 +3,7 @@ package WebService::LiveJournal::Client;
 use strict;
 use warnings;
 use 5.012;
-use overload '""' => \&toStr;
+use overload '""' => \&as_string;
 use Digest::MD5 qw(md5_hex);
 use RPC::XML;
 use RPC::XML::Client;
@@ -113,7 +113,7 @@ sub new    # arg: server, port, username, password, mode
   {
   
     my $response = $self->send_request('getchallenge');
-    return undef unless defined $response;
+    return unless defined $response;
     my $auth_challenge = $response->value->{challenge};
     my $auth_response = md5_hex($auth_challenge, md5_hex($password));
   
@@ -126,7 +126,7 @@ sub new    # arg: server, port, username, password, mode
             auth_response => new RPC::XML::string($auth_response),
     );
 
-    return undef unless defined $response;
+    return unless defined $response;
 
     my $ljsession = $self->{ljsession} = $response->value->{ljsession};
     $self->set_cookie(ljsession => $ljsession);  
@@ -147,18 +147,18 @@ sub new    # arg: server, port, username, password, mode
           #getpickwurls => $one,
   );
   
-  return undef unless defined $response;
+  return unless defined $response;
   
   my $h = $response->value;
   if(defined $h->{faultString})
   {
     $error = $h->{faultString};
-    return undef;
+    return;
   }
   if(defined $h->{faultCode})
   {
     $error = "unknown LJ error " . $h->{faultCode}->value;
-    return undef;
+    return;
   }
   
   $self->{userid} = $h->{userid};
@@ -237,6 +237,22 @@ sub useragent { $_[0]->{client}->useragent }
 
 =head1 METHODS
 
+=head2 $client-E<gt>create( %options )
+
+Creates a new event and returns it in the form of an instance of
+L<WebService::LiveJournal::Event>.  This does not create the 
+event on the LiveJournal server itself, until you use the 
+C<update> methods on the event.
+
+=cut
+
+sub create
+{
+  my $self = shift;
+  my $event = new WebService::LiveJournal::Event(client => $self, @_);
+  $event;
+}
+
 =head2 $client-E<gt>set_cookie( $key => $value )
 
 This method allows you to set a cookie for the appropriate security and expiration information.
@@ -302,7 +318,7 @@ sub send_request
         my $string = $response->value->{faultString};
         my $code = $response->value->{faultCode};
         $error = "$string ($code) on LJ.XMLRPC.getchallenge";
-        return undef;
+        return;
       }
       # else, stuff worked fall through 
     }
@@ -318,7 +334,7 @@ sub send_request
         return $response;
       }
       $error = $response;
-      return undef;
+      return;
     }
 
     # this is where we fall through down to from above
@@ -360,7 +376,7 @@ sub send_request
       my $code = $response->value->{faultCode};
       $error = "$string ($code) on LJ.XMLRPC.$procname";
       $error_request = $request;
-      return undef;
+      return;
     }
     return $response;
   }
@@ -380,7 +396,7 @@ sub send_request
       return $response;
     }
     $error = $response;
-    return undef;
+    return;
   }
 }
 
@@ -398,7 +414,7 @@ sub _post
   unless($http_response->is_success)
   {
     $error = "HTTP Error: " . $http_response->status_line;
-    return undef;
+    return;
   }
   
   my $response_text = $http_response->content;
@@ -416,13 +432,13 @@ sub _post
   unless(defined $h{success})
   {
     $error = "LJ Protocol error, server didn't return a success value";
-    return undef;
+    return;
   }
     
   if($h{success} ne 'OK')
   {
     $error = "LJ Protocol error: $h{errmsg}";
-    return undef;
+    return;
   }
   
   return \%h;
@@ -436,7 +452,7 @@ sub friendof
   push @list, friendoflimit => new RPC::XML::int($arg{friendoflimit}) if defined $arg{friendoflimit};
   push @list, friendoflimit => new RPC::XML::int($arg{limit}) if defined $arg{limit};
   my $response = $self->send_request('friendof', @list);
-  return undef unless defined $response;
+  return unless defined $response;
   return new WebService::LiveJournal::FriendList(response => $response);
 }
 
@@ -449,7 +465,7 @@ sub getfriends
   push @list, friendlimit => new RPC::XML::int($arg{limit}) if defined $arg{limit};
   push @list, includefriendof => 1, includegroups => 1 if $arg{complete};
   my $response = $self->send_request('getfriends', @list);
-  return undef unless defined $response;
+  return unless defined $response;
   if($arg{complete})
   {
     return (new WebService::LiveJournal::FriendList(response_list => $response->value->{friends}),
@@ -467,7 +483,7 @@ sub getfriendgroups
 {
   my $self = shift;
   my $response = $self->send_request('getfriendgroups');
-  return undef unless defined $response;
+  return unless defined $response;
   return new WebService::LiveJournal::FriendGroupList(response => $response);
 }
 
@@ -508,7 +524,7 @@ sub getevents
     unless(defined $arg{day} && defined $arg{month} && defined $arg{year})
     {
       $error = 'attempt to use selecttype=day without providing day!';
-      return undef;
+      return;
     }
     push  @list, 
       day   => new RPC::XML::int($arg{day}),
@@ -529,7 +545,7 @@ sub getevents
   else
   {
     $error = "unknown selecttype: $selecttype";
-    return undef;
+    return;
   }
   
   push @list, truncate => new RPC::XML::int($arg{truncate}) if $arg{truncate};
@@ -539,7 +555,7 @@ sub getevents
   push @list, usejournal => RPX::XML::string($arg{journal}) if $arg{journal};
 
   my $response = $self->send_request('getevents', @list);
-  return undef unless defined $response;
+  return unless defined $response;
   if($selecttype eq 'one')
   {
     return new WebService::LiveJournal::Event(client => $self, %{ $response->value->{events}->[0] });
@@ -552,14 +568,7 @@ sub getevents
 
 sub getevent { my $self = shift; $self->getevents('one', @_) }
 
-sub create
-{
-  my $self = shift;
-  my $event = new WebService::LiveJournal::Event(client => $self, @_);
-  $event;
-}
-
-sub toStr
+sub as_string
 {
   my $self = shift;
   my $username = $self->username;
@@ -626,7 +635,7 @@ sub send_flat_request
   if($self->{mode} eq 'challenge')
   {
     my $h = _post($self, mode => 'getchallenge');
-    return undef unless defined $h;
+    return unless defined $h;
     my %h = %{ $h };
 
     my $auth_challenge = $h{challenge};

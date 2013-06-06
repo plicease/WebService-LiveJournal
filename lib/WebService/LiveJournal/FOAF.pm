@@ -6,7 +6,7 @@ use NX;
 
 use XML::XPath;
 use base qw/ NX::CacheRobot/;
-use overload '""' => \&toStr;
+use overload '""' => \&as_string;
 use CGI::Lite qw/ url_decode /;
 use Encode qw/ decode_utf8 /;
 
@@ -24,7 +24,7 @@ sub new
   if($arg{user} =~ /^([A-Za-z0-9_]*)$/)
   { $user = $1 }
   else
-  { return undef }
+  { return }
   my $self = bless {
     server => $server,
     ua => NX::getRobotAgent(),
@@ -104,9 +104,9 @@ sub location
       return $self->{location} = $location 
     }
     else
-    { return undef }
+    { return }
   }
-  return undef;
+  return;
 }
 
 sub knows
@@ -119,7 +119,7 @@ sub knows
   return @list;
 }
 
-sub toStr
+sub as_string
 {
   my $self = shift;
   return sprintf("[lj_foaf %s (%s) %s, %s]", $self->name, $self->nick, $self->city, $self->country);

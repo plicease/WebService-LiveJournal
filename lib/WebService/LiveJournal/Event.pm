@@ -6,6 +6,33 @@ use RPC::XML;
 use WebService::LiveJournal::Thingie;
 our @ISA = qw/ WebService::LiveJournal::Thingie /;
 
+# ABSTRACT: LiveJournal event class
+# VERSION
+
+=head1 SYNOPSIS
+
+create an event
+
+ use WebService::LiveJournal::Client;
+ my $client = WebService::LiveJournal::Client->new(
+   username => $user,
+   password => $password,
+ );
+ 
+ # $event is an instance of WS::LJ::Event
+ my $event = $client->create;
+ $event->subject("this is a subject");
+ $event->event("this is the event content");
+ # doesn't show up on the LiveJournal server
+ # until you use the update method.
+ $event->update;
+
+=head1 DESCRIPTION
+
+This class represents an "event" on the LiveJournal server.
+
+=cut
+
 sub new
 {
   my $ob = shift;
@@ -57,7 +84,7 @@ sub _prep
     event => new RPC::XML::string($self->event),
     subject => new RPC::XML::string($self->subject),
     security => new RPC::XML::string($self->security),
-    lineendings => $WebService::LiveJournal::Client::lineendings_unix,
+    lineendings => do { no warnings; $WebService::LiveJournal::Client::lineendings_unix },
 
     year  => new RPC::XML::int($self->year),
     mon  => new RPC::XML::int($self->month),
@@ -116,7 +143,7 @@ sub editevent
     if(defined $response)
     { return 1 }
     else
-    { return undef }
+    { return }
   }
   else
   {
@@ -127,8 +154,25 @@ sub editevent
     if(defined $response)
     { return 1 }
     else
-    { return undef }
+    { return }
   }
+}
+
+sub _fill_in_default_time
+{
+  my($self) = @_;
+  return if defined $self->{year}
+  &&        defined $self->{month}
+  &&        defined $self->{day}
+  &&        defined $self->{hour}
+  &&        defined $self->{min};
+  my ($sec,$min,$hour,$mday,$month,$year,$wday,$yday,$isdst) = localtime(time);
+  $self->{year}  //= $year+1900;
+  $self->{month} //= $month;
+  $self->{day}   //= $mday;
+  $self->{hour}  //= $hour;
+  $self->{min}   //= $min;
+  return;
 }
 
 sub postevent
@@ -136,18 +180,20 @@ sub postevent
   my $self = shift;
   my $client = $self->client;
   
+  $self->_fill_in_default_time;
+  
   my $h;
   if(1)
   {
     my @list = _prep_flat($self, @_);
     $h = $client->send_flat_request('postevent', @list);
-    return undef unless defined $h;
+    return unless defined $h;
   }
   else
   {
     my @list = _prep($self, @_);
     my $response = $client->send_request('postevent', @list);
-    return undef unless defined $response;
+    return unless defined $response;
     $h = $response->value;
   }
 
@@ -156,6 +202,19 @@ sub postevent
   $self->{anum} = $h->{anum};
   return 1;
 }
+
+=head1 METHODS
+
+=head2 $event-E<gt>update
+
+Create a new (if it isn't on the LiveJournal server yet) or update
+the existing event on the LiveJournal server.
+
+Returns true on success.
+
+Returns false on failure and sets $WebService::liveJournal::Client::error
+
+=cut
 
 sub update
 {
@@ -170,7 +229,7 @@ sub update
   }
 }
 
-sub toStr
+sub as_string
 {
   my $self = shift;
   my $subject = $self->subject;
@@ -258,6 +317,7 @@ sub eventtime
       $self->{min} = $min;
     }
   }
+  no warnings;
   sprintf("%04d-%02d-%02d %02d:%02d:%02d", $self->year, $self->month, $self->day, $self->hour, $self->min);
 }
 
@@ -328,7 +388,7 @@ sub htmlid
   }
   else
   {
-    return undef;
+    return;
   }
 }
 
@@ -389,6 +449,13 @@ sub picture
     $self->{props}->{picture_keyword} = $value;
   }
   $self->{props}->{picture_keyword};
+}
+
+sub delete
+{
+  my($self) = @_;
+  $self->event('');
+  return $self->update;
 }
 
 1;

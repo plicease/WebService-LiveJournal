@@ -23,7 +23,7 @@ sub name { $_[0]->{name} }
 sub id { $_[0]->{id} }
 sub sortorder { $_[0]->{sortorder} }
 
-sub toStr { 
+sub as_string { 
   my $self = shift;
   my $name = $self->name;
   my $id = $self->id;

@@ -2,7 +2,7 @@ package WebService::LiveJournal::List;
 
 use strict;
 use warnings;
-use overload '""' => sub { $_[0]->toStr }, '@{}' => sub { $_[0]->{list} };
+use overload '""' => sub { $_[0]->as_string }, '@{}' => sub { $_[0]->{list} };
 
 sub new
 {
@@ -35,7 +35,7 @@ sub find
   {
     return $element if $element->name eq $key;
   }
-  return undef;
+  return;
 }
 
 1;

@@ -31,6 +31,6 @@ sub type { $_[0]->{type} }
 sub groupmask { $_[0]->{groupmask} }
 sub mask { $_[0]->{groupmask} }
 
-sub toStr { '[friend ' . $_[0]->{username} . ']' }
+sub as_string { '[friend ' . $_[0]->{username} . ']' }
 
 1;

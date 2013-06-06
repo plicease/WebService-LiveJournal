@@ -10,7 +10,8 @@ version 0.01
 
 =head1 SEE ALSO
 
-L<WebService::LiveJournal::Client>
+L<WebService::LiveJournal::Client>,
+L<http://www.livejournal.com/doc/server/index.html>
 
 =head1 AUTHOR
 
