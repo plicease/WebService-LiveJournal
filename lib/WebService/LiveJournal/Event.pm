@@ -33,6 +33,24 @@ This class represents an "event" on the LiveJournal server.
 
 =cut
 
+# crib sheet based on stuff i read in the doco may be
+# complete rubbish.
+#
+# itemid (req)    # (int)
+# event (req)    # (string) set to empty to delete
+# lineendings (req)  # (string) "unix"
+# subject (req)    # (string)
+# security (opt)  # (string) public|private|usemask (defaults to public)
+# allowmask (opt)  # (int)
+# year (req)    # (4-digit int)
+# mon (req)    # (1- or 2-digit month int)
+# day (req)    # (1- or 2-digit day int)
+# hour (req)    # (1- or 2-digit hour int 0..23)
+# min (req)    # (1- or 2-digit day int 0..60)
+# props (req)    # (struct)
+# usejournal (opt)  # (string)
+# 
+
 sub new
 {
   my $ob = shift;
@@ -61,20 +79,251 @@ sub new
   return $self;
 }
 
-# itemid (req)    # (int)
-# event (req)    # (string) set to empty to delete
-# lineendings (req)  # (string) "unix"
-# subject (req)    # (string)
-# security (opt)  # (string) public|private|usemask (defaults to public)
-# allowmask (opt)  # (int)
-# year (req)    # (4-digit int)
-# mon (req)    # (1- or 2-digit month int)
-# day (req)    # (1- or 2-digit day int)
-# hour (req)    # (1- or 2-digit hour int 0..23)
-# min (req)    # (1- or 2-digit day int 0..60)
-# props (req)    # (struct)
-# usejournal (opt)  # (string)
-# 
+=head1 ATTRIBUTES
+
+=head2 $event-E<gt>subject
+
+Required.
+
+The subject for the event.
+
+=cut
+
+sub subject
+{
+  my $self = shift;
+  my $value = shift;
+  $self->{subject} = $value if defined $value;
+  $self->{subject};
+}
+
+=head2 $event-E<gt>event
+
+Required.
+
+The content of the event.
+
+=cut
+
+sub event
+{
+  my $self = shift;
+  my $value = shift;
+  $self->{event} = $value if defined $value;
+  $self->{event};
+}
+
+=head2 $event-E<gt>year
+
+Year
+
+=cut
+
+sub year
+{
+  my $self = shift;
+  my $value = shift;
+  $self->{year} = $value if defined $value;
+  $self->{year};
+}
+
+=head2 $event-E<gt>month
+
+Month
+
+=cut
+
+sub month
+{
+  my $self = shift;
+  my $value = shift;
+  $self->{month} = $value if defined $value;
+  $self->{month};
+}
+
+=head2 $event-E<gt>day
+
+Day
+
+=cut
+
+sub day
+{
+  my $self = shift;
+  my $value = shift;
+  $self->{day} = $value if defined $value;
+  $self->{day};
+}
+
+=head2 $event-E<gt>hour
+
+Hour
+
+=cut
+
+sub hour
+{
+  my $self = shift;
+  my $value = shift;
+  $self->{hour} = $value if defined $value;
+  $self->{hour};
+}
+
+=head2 $event-E<gt>min
+
+Minute
+
+=cut
+
+sub min
+{
+  my $self = shift;
+  my $value = shift;
+  $self->{min} = $value if defined $value;
+  $self->{min};
+}
+
+=head2 $event-E<gt>security
+
+One of
+
+=over 4
+
+=item public
+
+=item private
+
+=item friends
+
+=item usemask
+
+=back
+
+=cut
+
+sub security
+{
+  my $self = shift;
+  my $value = shift;
+  if(defined $value)
+  {
+    if($value eq 'friends')
+    {
+      $self->{security} = 'usemask';
+      $self->{allowmask} = 1;
+    }
+    else
+    {
+      $self->{security} = $value;
+    }
+  }
+  $self->{security};
+}
+
+=head2 $event-E<gt>allowmask
+
+FIXME
+
+=cut
+
+sub allowmask
+{
+  my $self = shift;
+  my $value = shift;
+  $self->{allowmask} = $value if defined $value;
+  $self->{allowmask};
+}
+
+=head2 $event-E<gt>itemid
+
+Read only.
+
+The LiveJournal item id
+
+=head2 $event-E<gt>url
+
+Read only.
+
+URL for the LiveJournal event.
+
+=head2 $event-E<gt>anum
+
+Read only.
+
+The anum for the event.
+
+I am not really sure what this is for to be honest.
+
+=head2 $event-E<gt>usejournal
+
+FIXME
+
+=cut
+
+sub itemid { $_[0]->{itemid} }
+sub url { $_[0]->{url} }
+sub anum { $_[0]->{anum} }
+sub usejournal { $_[0]->{usejournal} }
+
+=head2 $event-E<gt>props
+
+Property hash
+
+=cut
+
+sub props { $_[0]->{props} }
+
+=head1 METHODS
+
+=head2 $event-E<gt>update
+
+Create a new (if it isn't on the LiveJournal server yet) or update
+the existing event on the LiveJournal server.
+
+Returns true on success.
+
+Returns false on failure and sets $WebService::liveJournal::Client::error
+
+=cut
+
+sub update
+{
+  my $self = shift;
+  if(defined $self->itemid)
+  {
+    return $self->editevent;
+  }
+  else
+  {
+    return $self->postevent;
+  }
+}
+
+=head2 $event-E<gt>delete
+
+Remove the event on the LiveJournal server.
+
+=cut
+
+sub delete
+{
+  my($self) = @_;
+  $self->event('');
+  return $self->update;
+}
+
+=head2 $event-E<gt>getprop( $key )
+
+Get the property with the given key
+
+=head2 $event-E<gt>setprop( $key => $value )
+
+Set the property with the given key and value
+
+=cut
+
+sub getprop { $_[0]->{props}->{$_[1]} }
+sub setprop { $_[0]->{props}->{$_[1]} = $_[2] }
 
 sub _prep
 {
@@ -203,32 +452,6 @@ sub postevent
   return 1;
 }
 
-=head1 METHODS
-
-=head2 $event-E<gt>update
-
-Create a new (if it isn't on the LiveJournal server yet) or update
-the existing event on the LiveJournal server.
-
-Returns true on success.
-
-Returns false on failure and sets $WebService::liveJournal::Client::error
-
-=cut
-
-sub update
-{
-  my $self = shift;
-  if(defined $self->itemid)
-  {
-    return $self->editevent;
-  }
-  else
-  {
-    return $self->postevent;
-  }
-}
-
 sub as_string
 {
   my $self = shift;
@@ -236,126 +459,6 @@ sub as_string
   $subject = 'untitled' if !defined $subject || $subject eq '';
   "[event $subject]";
 }
-
-sub subject
-{
-  my $self = shift;
-  my $value = shift;
-  $self->{subject} = $value if defined $value;
-  $self->{subject};
-}
-
-sub event
-{
-  my $self = shift;
-  my $value = shift;
-  $self->{event} = $value if defined $value;
-  $self->{event};
-}
-
-sub year
-{
-  my $self = shift;
-  my $value = shift;
-  $self->{year} = $value if defined $value;
-  $self->{year};
-}
-
-sub month
-{
-  my $self = shift;
-  my $value = shift;
-  $self->{month} = $value if defined $value;
-  $self->{month};
-}
-
-sub day
-{
-  my $self = shift;
-  my $value = shift;
-  $self->{day} = $value if defined $value;
-  $self->{day};
-}
-
-sub hour
-{
-  my $self = shift;
-  my $value = shift;
-  $self->{hour} = $value if defined $value;
-  $self->{hour};
-}
-
-sub min
-{
-  my $self = shift;
-  my $value = shift;
-  $self->{min} = $value if defined $value;
-  $self->{min};
-}
-
-sub eventtime
-{
-  my $self = shift;
-  my $value = shift;
-  if(defined $value)
-  {
-    if($value =~ m/^(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)$/)
-    {
-      $self->{year} = $1;
-      $self->{month} = $2;
-      $self->{day} = $3;
-      $self->{hour} = $4;
-      $self->{min} = $5;
-    }
-    elsif($value eq 'now')
-    {
-      my($sec,$min,$hour,$mday,$month,$year,$wday,$yday,$isdst) = localtime(time);
-      $self->{year} = $year+1900;
-      $self->{month} = $month+1;
-      $self->{day} = $mday;
-      $self->{hour} = $hour;
-      $self->{min} = $min;
-    }
-  }
-  no warnings;
-  sprintf("%04d-%02d-%02d %02d:%02d:%02d", $self->year, $self->month, $self->day, $self->hour, $self->min);
-}
-
-sub security
-{
-  my $self = shift;
-  my $value = shift;
-  if(defined $value)
-  {
-    if($value eq 'friends')
-    {
-      $self->{security} = 'usemask';
-      $self->{allowmask} = 1;
-    }
-    else
-    {
-      $self->{security} = $value;
-    }
-  }
-  $self->{security};
-}
-
-sub allowmask
-{
-  my $self = shift;
-  my $value = shift;
-  $self->{allowmask} = $value if defined $value;
-  $self->{allowmask};
-}
-
-sub props { $_[0]->{props} }
-
-sub getprop { $_[0]->{props}->{$_[1]} }
-sub setprop { $_[0]->{props}->{$_[1]} = $_[2] }
-sub itemid { $_[0]->{itemid} }
-sub url { $_[0]->{url} }
-sub anum { $_[0]->{anum} }
-sub usejournal { $_[0]->{usejournal} }
 
 sub gettags
 {
@@ -451,11 +554,32 @@ sub picture
   $self->{props}->{picture_keyword};
 }
 
-sub delete
+sub eventtime
 {
-  my($self) = @_;
-  $self->event('');
-  return $self->update;
+  my $self = shift;
+  my $value = shift;
+  if(defined $value)
+  {
+    if($value =~ m/^(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)$/)
+    {
+      $self->{year} = $1;
+      $self->{month} = $2;
+      $self->{day} = $3;
+      $self->{hour} = $4;
+      $self->{min} = $5;
+    }
+    elsif($value eq 'now')
+    {
+      my($sec,$min,$hour,$mday,$month,$year,$wday,$yday,$isdst) = localtime(time);
+      $self->{year} = $year+1900;
+      $self->{month} = $month+1;
+      $self->{day} = $mday;
+      $self->{hour} = $hour;
+      $self->{min} = $min;
+    }
+  }
+  no warnings;
+  sprintf("%04d-%02d-%02d %02d:%02d:%02d", $self->year, $self->month, $self->day, $self->hour, $self->min);
 }
 
 1;

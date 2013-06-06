@@ -6,6 +6,34 @@ use WebService::LiveJournal::List;
 use WebService::LiveJournal::Event;
 our @ISA = qw/ WebService::LiveJournal::List /;
 
+# ABSTRACT: List of LiveJournal events
+# VERSION
+
+=head1 SYNOPSIS
+
+ use WebService::LiveJournal::Client;
+ my $client = WebService::LiveJournal::Client->new(
+   username => $user,
+   password => $pass,
+ );
+ 
+ # $list is an instance of WS::LJ::EventList
+ my $list = $client->getevents('lastn', howmany => 50);
+ 
+ foreach my $event (@$list)
+ {
+   # event is an instance of WS::LJ::Event
+   ...
+ }
+
+
+=head1 DESCRIPTION
+
+This class represents a list of LiveJournal events.  It can be used
+as a array reference.
+
+=cut
+
 sub init
 {
   my $self = shift;
@@ -39,3 +67,11 @@ sub as_string
 }
 
 1;
+
+=head1 SEE ALSO
+
+L<WebService::LiveJournal>,
+L<WebService::LiveJournal::Event>,
+L<WebService::LiveJournal::Client>
+
+=cut

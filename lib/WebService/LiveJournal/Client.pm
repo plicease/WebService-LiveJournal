@@ -244,6 +244,12 @@ L<WebService::LiveJournal::Event>.  This does not create the
 event on the LiveJournal server itself, until you use the 
 C<update> methods on the event.
 
+C<%options> contains a hash of attribute key, value pairs for
+the new L<WebService::LiveJournal::Event>.  The only required
+attributes are C<subject> and C<event>, though you may set these
+values after the event is created as long as you set them
+before you try to C<update> the event.
+
 =cut
 
 sub create
@@ -251,6 +257,142 @@ sub create
   my $self = shift;
   my $event = new WebService::LiveJournal::Event(client => $self, @_);
   $event;
+}
+
+=head2 $client-E<gt>getevents( $select_type, %query )
+
+Selects events from the LiveJournal server.  The actual C<%query>
+parameter requirements depend on the C<$select_type>.
+
+Returns an instance of L<WebService::LiveJournal::EventList>.
+
+Select types:
+
+=over 4
+
+=item syncitems
+
+This query mode can be used to sync all entries with multiple calls.
+
+=over 4
+
+=item lastsync
+
+The date of the last sync in the format of C<yyyy-mm-dd hh:mm:ss>
+
+=back
+
+=item day
+
+This query can be used to fetch all the entries for a particular day.
+
+=over 4
+
+=item year
+
+4 digit integer
+
+=item month
+
+1 or 2 digit integer, 1-31
+
+=item day
+
+integer 1-12 
+
+=back
+
+=item lastn
+
+Fetch the last n events from the LiveJournal server.
+
+=over 4
+
+=item howmany
+
+integer, default = 20, max = 50
+
+=item beforedate
+
+date of the format C<yyyy-mm-dd hh:mm:ss>
+
+=back
+
+=back
+
+=cut
+
+sub getevents
+{
+  my $self = shift;
+  my @list;
+  my $selecttype = shift || 'lastn';
+  push @list, selecttype => new RPC::XML::string($selecttype);
+
+  my %arg = @_;
+
+  if($selecttype eq 'syncitems')
+  {
+    push @list, lastsync => new RPC::XML::string($arg{lastsync}) if defined $arg{lastsync};
+  }
+  elsif($selecttype eq 'day')
+  {
+    unless(defined $arg{day} && defined $arg{month} && defined $arg{year})
+    {
+      $error = 'attempt to use selecttype=day without providing day!';
+      return;
+    }
+    push  @list, 
+      day   => new RPC::XML::int($arg{day}),
+      month  => new RPC::XML::int($arg{month}),
+      year  => new RPC::XML::int($arg{year});
+  }
+  elsif($selecttype eq 'lastn')
+  {
+    push @list, howmany => new RPC::XML::int($arg{howmany}) if defined $arg{howmany};
+    push @list, howmany => new RPC::XML::int($arg{max}) if defined $arg{max};
+    push @list, beforedate => new RPC::XML::string($arg{beforedate}) if defined $arg{beforedate};
+  }
+  elsif($selecttype eq 'one')
+  {
+    my $itemid = $arg{itemid} || -1;
+    push @list, itemid => new RPC::XML::int($itemid);
+  }
+  else
+  {
+    $error = "unknown selecttype: $selecttype";
+    return;
+  }
+  
+  push @list, truncate => new RPC::XML::int($arg{truncate}) if $arg{truncate};
+  push @list, prefersubject => $one if $arg{prefersubject};
+  push @list, lineendings => $lineendings_unix;
+  push @list, usejournal => RPX::XML::string($arg{usejournal}) if $arg{usejournal};
+  push @list, usejournal => RPX::XML::string($arg{journal}) if $arg{journal};
+
+  my $response = $self->send_request('getevents', @list);
+  return unless defined $response;
+  if($selecttype eq 'one')
+  {
+    return new WebService::LiveJournal::Event(client => $self, %{ $response->value->{events}->[0] });
+  }
+  else
+  {
+    return new WebService::LiveJournal::EventList(client => $self, response => $response);
+  }
+}
+
+=head2 $client-E<gt>getevent( $itemid )
+
+Given an C<itemid> (the internal LiveJournal identifier for an event).
+
+=cut
+
+sub getevent
+{
+  my $self = shift;
+  my %args = @_ == 1 ? (itemid => shift) : (@_);
+  $self->getevents('one', %args);
 }
 
 =head2 $client-E<gt>set_cookie( $key => $value )
@@ -486,87 +628,6 @@ sub getfriendgroups
   return unless defined $response;
   return new WebService::LiveJournal::FriendGroupList(response => $response);
 }
-
-# truncate    (int)
-# prefersubject    (bool)
-# noprop    (bool)
-# lineendings (req)  (string)
-# usejournal    (string)
-
-# selecttype (req)  day|lastn|one|syncitems
-#  selecttype=syncitems
-#   lastsync    (string-date yyyy-mm-dd hh:mm:ss) (for selecttype=syncitems)
-#  selecttype=day
-#   year    (4-digit int) (for selecttype=day)
-#   month    (1- or 2-digit int) (for selecttype=day)
-#   day      (1- or 2-digit day of the month)
-#  selecttype=lastn
-#   howmany    (int, default=20, max=50)
-#   beforedate    (string-date yyyy-mm-dd hh:mm:ss)
-#  selecttype=one
-#   itemid    (int) -1 for last entry
-
-sub getevents
-{
-  my $self = shift;
-  my @list;
-  my $selecttype = shift || 'lastn';
-  push @list, selecttype => new RPC::XML::string($selecttype);
-
-  my %arg = @_;
-
-  if($selecttype eq 'syncitems')
-  {
-    push @list, lastsync => new RPC::XML::string($arg{lastsync}) if defined $arg{lastsync};
-  }
-  elsif($selecttype eq 'day')
-  {
-    unless(defined $arg{day} && defined $arg{month} && defined $arg{year})
-    {
-      $error = 'attempt to use selecttype=day without providing day!';
-      return;
-    }
-    push  @list, 
-      day   => new RPC::XML::int($arg{day}),
-      month  => new RPC::XML::int($arg{month}),
-      year  => new RPC::XML::int($arg{year});
-  }
-  elsif($selecttype eq 'lastn')
-  {
-    push @list, howmany => new RPC::XML::int($arg{howmany}) if defined $arg{howmany};
-    push @list, howmany => new RPC::XML::int($arg{max}) if defined $arg{max};
-    push @list, beforedate => new RPC::XML::string($arg{beforedate}) if defined $arg{beforedate};
-  }
-  elsif($selecttype eq 'one')
-  {
-    my $itemid = $arg{itemid} || -1;
-    push @list, itemid => new RPC::XML::int($itemid);
-  }
-  else
-  {
-    $error = "unknown selecttype: $selecttype";
-    return;
-  }
-  
-  push @list, truncate => new RPC::XML::int($arg{truncate}) if $arg{truncate};
-  push @list, prefersubject => $one if $arg{prefersubject};
-  push @list, lineendings => $lineendings_unix;
-  push @list, usejournal => RPX::XML::string($arg{usejournal}) if $arg{usejournal};
-  push @list, usejournal => RPX::XML::string($arg{journal}) if $arg{journal};
-
-  my $response = $self->send_request('getevents', @list);
-  return unless defined $response;
-  if($selecttype eq 'one')
-  {
-    return new WebService::LiveJournal::Event(client => $self, %{ $response->value->{events}->[0] });
-  }
-  else
-  {
-    return new WebService::LiveJournal::EventList(client => $self, response => $response);
-  }
-}
-
-sub getevent { my $self = shift; $self->getevents('one', @_) }
 
 sub as_string
 {

@@ -4,6 +4,9 @@ use strict;
 use warnings;
 use overload '""' => sub { $_[0]->as_string }, '@{}' => sub { $_[0]->{list} };
 
+# ABSTRACT: List base class for WebService::LiveJournal
+# VERSION
+
 sub new
 {
   my $ob = shift;
