@@ -2,7 +2,7 @@ package WebService::LiveJournal::Client;
 
 use strict;
 use warnings;
-use 5.012;
+use v5.10;
 use overload '""' => \&as_string;
 use Digest::MD5 qw(md5_hex);
 use RPC::XML;
