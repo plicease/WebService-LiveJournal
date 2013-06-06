@@ -18,7 +18,7 @@ sub new
 
   foreach my $member (@{ $self })
   {
-    $member->setclient($arg{client});
+    $member->client($arg{client});
   }
 
   return $self;
