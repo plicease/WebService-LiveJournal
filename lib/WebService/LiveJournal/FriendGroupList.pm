@@ -6,6 +6,9 @@ use WebService::LiveJournal::List;
 use WebService::LiveJournal::FriendGroup;
 our @ISA = qw/ WebService::LiveJournal::List /;
 
+# ABSTRACT: List of LiveJournal friend groups
+# VERSION
+
 sub init
 {
   my $self = shift;

@@ -5,6 +5,9 @@ use warnings;
 use WebService::LiveJournal::Thingie;
 our @ISA = qw/ WebService::LiveJournal::Thingie /;
 
+# ABSTRACT: LiveJournal friend class
+# VERSION
+
 sub new
 {
   my $ob = shift;
