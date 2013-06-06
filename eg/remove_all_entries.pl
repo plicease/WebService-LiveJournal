@@ -15,15 +15,15 @@ my $password = <STDIN>;
 chomp $password;
 
 my $client = WebService::LiveJournal::Client->new(
-	server => 'www.livejournal.com',
-	username => $user,
-	password => $password,
+  server => 'www.livejournal.com',
+  username => $user,
+  password => $password,
 );
 
 unless(defined $client)
 {
-	print "connect error: $WebService::LiveJournal::Client::error\n";
-	exit;
+  print "connect error: $WebService::LiveJournal::Client::error\n";
+  exit;
 }
 
 print "$client\n";
@@ -31,15 +31,15 @@ print "$client\n";
 my $count = 1;
 while($count > 0)
 {
-	$count = 0;
-	my $event_list = $client->getevents('lastn', howmany => 50);
-	foreach my $event (@{ $event_list })
-	{
-		print $event->subject, "\n";
-		$event->event('');	# setting the "event" or body to an entry to empty 
-		$event->update;		# string will delete it
-		$count++;
-	}
+  $count = 0;
+  my $event_list = $client->getevents('lastn', howmany => 50);
+  foreach my $event (@{ $event_list })
+  {
+    print $event->subject, "\n";
+    $event->event('');	# setting the "event" or body to an entry to empty 
+    $event->update;		# string will delete it
+    $count++;
+  }
 }
 
 print "$count entries deleted";
