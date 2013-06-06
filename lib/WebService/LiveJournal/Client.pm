@@ -49,7 +49,7 @@ $RPC::XML::ENCODING = 'utf-8';  # uh... and WHY??? is this a global???
 Connects to a LiveJournal server using the host and user information
 provided by C<%options>.  Returns an instance of 
 WebService::LiveJournal::Client on success, returns undef and sets
-$WebService::LiveJournal::Client::error to an appropriate message
+C<$WebService::LiveJournal::Client::error> to an appropriate message
 on failure.
 
 =head3 options
@@ -182,6 +182,8 @@ sub new    # arg: server, port, username, password, mode
 
 =head1 ATTRIBUTES
 
+These attributes are read-only.
+
 =head2 $client-E<gt>server
 
 The name of the LiveJournal server
@@ -225,17 +227,22 @@ FIXME document
 
 =cut
 
-sub server { $_[0]->{server} }
-sub username { $_[0]->{username} }
-sub port { $_[0]->{port} }
-sub userid { $_[0]->{userid} }
-sub fullname { $_[0]->{fullname} }
-sub usejournals { @{ $_[0]->{usejournals} } }
-sub fastserver { $_[0]->{fastserver} }
-sub cachefriendgroups { $_[0]->{cachefriendgroups} }
-sub message { $_[0]->{message} }
+foreach my $name (qw( server username port userid fullname usejournals fastserver cachefriendgroups message cookie_jar ))
+{
+  eval qq{ sub $name { shift->{$name} } };
+  die $@ if $@;
+}
+
 sub useragent { $_[0]->{client}->useragent }
-sub cookie_jar { $_[0]->{cookie_jar} }
+
+=head1 METHODS
+
+=head2 $client-E<gt>set_cookie( $key => $value )
+
+This method allows you to set a cookie for the appropriate security and expiration information.
+You shouldn't need to call it directly, but is available here if necessary.
+
+=cut
 
 sub set_cookie
 {
@@ -244,17 +251,31 @@ sub set_cookie
   my $value = shift;
 
   $self->cookie_jar->set_cookie(
-        0,         # version
+        0,                   # version
         $key => $value,      # key => value
-        '/',        # path
-        $self->{domain},    # domain
-        $self->port,       # port
-        1,         # path_spec
-        0,        # secure
-        60*60*24,      # maxage
-        0,        # discard
+        '/',                 # path
+        $self->{domain},     # domain
+        $self->port,         # port
+        1,                   # path_spec
+        0,                   # secure
+        60*60*24,            # maxage
+        0,                   # discard
   );
 }
+
+=head2 $client-E<gt>send_request( $procname, @arguments )
+
+Make a low level request to LiveJournal with the given
+C<$procname> (the rpc procedure name) and C<@arguments>
+(should be L<RPC::XML> types).
+
+On success returns the appropriate L<RPC::XML> type
+(usually RPC::XML::struct).
+
+On error it returns undef and sets 
+C<$WebService::LiveJournal::Client::error> on error.
+
+=cut
 
 sub send_request
 {
@@ -405,39 +426,6 @@ sub _post
   }
   
   return \%h;
-}
-
-sub send_flat_request
-{
-  $error = undef;
-  my $self = shift;
-  my $count = $self->{count} || 1;
-  my $procname = shift;
-  my $ua = $self->{client}->useragent;
-
-  my @challenge;
-  if($self->{mode} eq 'challenge')
-  {
-    my $h = _post($self, mode => 'getchallenge');
-    return undef unless defined $h;
-    my %h = %{ $h };
-
-    my $auth_challenge = $h{challenge};
-
-    my $auth_response = md5_hex($auth_challenge, md5_hex($self->{password}));
-    @challenge = (
-      auth_method => 'challenge',
-      auth_challenge => $auth_challenge,
-      auth_response => $auth_response,
-    );
-  }
-  
-  return _post($self, 
-    mode => $procname, 
-    @{ $self->{flat_auth} },
-    @challenge,
-    @_
-  );
 }
 
 sub friendof
@@ -612,6 +600,51 @@ sub findallitemid
   }
 
   return @list;
+}
+
+=head2 $client-E<gt>send_flat_request( $procname, @arguments )
+
+Sends a low level request to the LiveJournal server using the flat API,
+with the given C<$procname> (the rpc procedure name) and C<@arguments>.
+
+On success returns the appropriate response.
+
+On error it returns undef and sets 
+C<$WebService::LiveJournal::Client::error> on error.
+
+=cut
+
+sub send_flat_request
+{
+  $error = undef;
+  my $self = shift;
+  my $count = $self->{count} || 1;
+  my $procname = shift;
+  my $ua = $self->{client}->useragent;
+
+  my @challenge;
+  if($self->{mode} eq 'challenge')
+  {
+    my $h = _post($self, mode => 'getchallenge');
+    return undef unless defined $h;
+    my %h = %{ $h };
+
+    my $auth_challenge = $h{challenge};
+
+    my $auth_response = md5_hex($auth_challenge, md5_hex($self->{password}));
+    @challenge = (
+      auth_method => 'challenge',
+      auth_challenge => $auth_challenge,
+      auth_response => $auth_response,
+    );
+  }
+  
+  return _post($self, 
+    mode => $procname, 
+    @{ $self->{flat_auth} },
+    @challenge,
+    @_
+  );
 }
 
 1;
