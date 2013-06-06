@@ -11,7 +11,8 @@ use v5.10;
 
 =head1 SEE ALSO
 
-L<WebService::LiveJournal::Client>
+L<WebService::LiveJournal::Client>,
+L<http://www.livejournal.com/doc/server/index.html>
 
 =cut
 
