@@ -33,7 +33,7 @@ same thing with the old interface
 
 =head1 DESCRIPTION
 
-This is the client class for communicating with LiveJournal using its API.  It is different
+This is a client class for communicating with LiveJournal using its API.  It is different
 from the other LJ modules on CPAN in that it originally used the XML-RPC API.  It now
 uses a hybrid of the flat and XML-RPC API to avoid bugs in some LiveJournal deployments.
 
@@ -751,7 +751,7 @@ sub _clear_error
 
 The code in this distribution was written many years ago to sync my website
 with my LiveJournal.  It has some ugly warts and its interface was not well 
-planned or thought out, it has many omissions and contains much tat is apocryphal 
+planned or thought out, it has many omissions and contains much that is apocryphal 
 (or at least wildly inaccurate), but it (possibly) scores over the older 
 LiveJournal modules on CPAN in that it has been used in production for 
 many many years with very little maintenance required, and at the time of 
