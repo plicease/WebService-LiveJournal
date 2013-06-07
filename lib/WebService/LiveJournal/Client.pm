@@ -31,6 +31,8 @@ same thing with the old interface
  my $client = WebService::LiveJournal::Client->new( username => 'foo', password => 'bar' );
  die "connection error: $WebService::LiveJournal::Client::error" unless defined $client;
 
+see L<WebService::LiveJournal::Event> for creating/updating LiveJournal events.
+
 =head1 DESCRIPTION
 
 This is a client class for communicating with LiveJournal using its API.  It is different
@@ -248,7 +250,7 @@ sub useragent { $_[0]->{client}->useragent }
 
 =head1 METHODS
 
-=head2 $client-E<gt>create( %options )
+=head2 $client-E<gt>create_event( %options )
 
 Creates a new event and returns it in the form of an instance of
 L<WebService::LiveJournal::Event>.  This does not create the 
@@ -279,14 +281,17 @@ selected by throwing an exception or returning undef.
 
 =cut
 
-sub create
+sub create_event
 {
   my $self = shift;
   my $event = new WebService::LiveJournal::Event(client => $self, @_);
   $event;
 }
 
-=head2 $client-E<gt>getevents( $select_type, %query )
+# legacy
+sub create { shift->create_event(@_) }
+
+=head2 $client-E<gt>get_events( $select_type, %query )
 
 Selects events from the LiveJournal server.  The actual C<%query>
 parameter requirements depend on the C<$select_type>.
@@ -352,7 +357,7 @@ selected by throwing an exception or returning undef.
 
 =cut
 
-sub getevents
+sub get_events
 {
   my $self = shift;
   my @list;
@@ -410,7 +415,10 @@ sub getevents
   }
 }
 
-=head2 $client-E<gt>getevent( $itemid )
+# legacy
+sub getevents { shift->get_events(@_) }
+
+=head2 $client-E<gt>get_event( $itemid )
 
 Given an C<itemid> (the internal LiveJournal identifier for an event).
 
@@ -419,12 +427,15 @@ selected by throwing an exception or returning undef.
 
 =cut
 
-sub getevent
+sub get_event
 {
   my $self = shift;
   my %args = @_ == 1 ? (itemid => shift) : (@_);
-  $self->getevents('one', %args);
+  $self->get_events('one', %args);
 }
+
+# legacy
+sub getevent { shift->get_event(@_) }
 
 =head2 $client-E<gt>set_cookie( $key => $value )
 

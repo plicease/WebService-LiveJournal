@@ -13,19 +13,35 @@ our @ISA = qw/ WebService::LiveJournal::Thingie /;
 
 create an event
 
- use WebService::LiveJournal::Client;
+ use WebService::LiveJournal;
  my $client = WebService::LiveJournal::Client->new(
    username => $user,
    password => $password,
  );
  
  # $event is an instance of WS::LJ::Event
- my $event = $client->create;
+ my $event = $client->create_event;
  $event->subject("this is a subject");
  $event->event("this is the event content");
  # doesn't show up on the LiveJournal server
  # until you use the update method.
  $event->update;
+ 
+ # save the itemid for later use
+ $itemid = $event->itemid;
+
+update an existing event
+
+ use WebService::LiveJournal;
+ my $client = WebService::LiveJournal::Client->new(
+   username => $user,
+   password => $password,
+ );
+ 
+ my $event = $client->get_event( $itemid );
+ $event->subject('new subject');
+ $event->update;
+        
 
 =head1 DESCRIPTION
 
@@ -321,11 +337,11 @@ sub delete
   return $self->update;
 }
 
-=head2 $event-E<gt>getprop( $key )
+=head2 $event-E<gt>get_prop( $key )
 
 Get the property with the given key
 
-=head2 $event-E<gt>setprop( $key => $value )
+=head2 $event-E<gt>set_prop( $key => $value )
 
 Set the property with the given key and value
 
@@ -333,6 +349,8 @@ Set the property with the given key and value
 
 sub getprop { $_[0]->{props}->{$_[1]} }
 sub setprop { $_[0]->{props}->{$_[1]} = $_[2] }
+sub get_prop { $_[0]->{props}->{$_[1]} }
+sub set_prop { $_[0]->{props}->{$_[1]} = $_[2] }
 
 sub _prep
 {
