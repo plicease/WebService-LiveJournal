@@ -123,6 +123,11 @@ Instance of L<LWP::UserAgent> used to connect to LiveJournal
 
 Instance of L<HTTP::Cookies> used to connect to LiveJournal with
 
+=head2 $client-E<gt>fastserver
+
+True if you have a paid account and are entitled to use the
+fast server mode.
+
 =head1 METHODS
 
 =head2 $client-E<gt>create_event( %options )
