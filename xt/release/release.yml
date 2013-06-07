@@ -19,6 +19,18 @@ pod_spelling_system:
     - rpc
     - syncitems
     - userid
+    - fastserver
+    - friendlimit
+    - friendoflimit
+    - usejournals
+    - useragent
+    - allowmask
+    - anum
+    - itemid
+    - url
+    - usejournal
+    - bgcolor
+    - fgcolor
 
 pod_coverage:
   # format is "Class#method" or "Class", regex allowed

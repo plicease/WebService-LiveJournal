@@ -98,7 +98,7 @@ sub new
 
 =head1 ATTRIBUTES
 
-=head2 $event-E<gt>subject
+=head2 subject
 
 Required.
 
@@ -114,7 +114,7 @@ sub subject
   $self->{subject};
 }
 
-=head2 $event-E<gt>event
+=head2 event
 
 Required.
 
@@ -130,7 +130,7 @@ sub event
   $self->{event};
 }
 
-=head2 $event-E<gt>year
+=head2 year
 
 Year
 
@@ -144,7 +144,7 @@ sub year
   $self->{year};
 }
 
-=head2 $event-E<gt>month
+=head2 month
 
 Month
 
@@ -158,7 +158,7 @@ sub month
   $self->{month};
 }
 
-=head2 $event-E<gt>day
+=head2 day
 
 Day
 
@@ -172,7 +172,7 @@ sub day
   $self->{day};
 }
 
-=head2 $event-E<gt>hour
+=head2 hour
 
 Hour
 
@@ -186,7 +186,7 @@ sub hour
   $self->{hour};
 }
 
-=head2 $event-E<gt>min
+=head2 min
 
 Minute
 
@@ -200,7 +200,7 @@ sub min
   $self->{min};
 }
 
-=head2 $event-E<gt>security
+=head2 security
 
 One of
 
@@ -237,7 +237,7 @@ sub security
   $self->{security};
 }
 
-=head2 $event-E<gt>allowmask
+=head2 allowmask
 
 Relevant when security is usemask. A 32-bit unsigned integer 
 representing which of the user's groups of friends are allowed 
@@ -255,7 +255,7 @@ sub allowmask
   $self->{allowmask};
 }
 
-=head2 $event-E<gt>picture
+=head2 picture
 
 The picture tag to use for this entry.  Each icon picture
 may have one or more tags, you can select it by using any
@@ -274,26 +274,26 @@ sub picture
   $self->{props}->{picture_keyword};
 }
 
-=head2 $event-E<gt>itemid
+=head2 itemid
 
 Read only.
 
 The LiveJournal item id
 
-=head2 $event-E<gt>url
+=head2 url
 
 Read only.
 
 URL for the LiveJournal event.
 
-=head2 $event-E<gt>anum
+=head2 anum
 
 Read only.
 
 The authentication number generated for this entry
 Probably best ignored.
 
-=head2 $event-E<gt>usejournal
+=head2 usejournal
 
 If editing a shared journal entry, include this key and the username
 you wish to edit the entry in. By default, you edit the entry as if
@@ -306,7 +306,7 @@ sub url { $_[0]->{url} }
 sub anum { $_[0]->{anum} }
 sub usejournal { $_[0]->{usejournal} }
 
-=head2 $event-E<gt>props
+=head2 props
 
 Property hash
 
@@ -617,7 +617,7 @@ sub set_access
 
 =head2 get_access
 
-Returns the access informaton for the entry.  It will always return the type
+Returns the access information for the entry.  It will always return the type
 as defined above in the C<set_access> method.  In addition for the C<group>
 type the list of groups will also be returned:
 

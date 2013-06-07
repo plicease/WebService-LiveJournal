@@ -8,6 +8,34 @@ our @ISA = qw/ WebService::LiveJournal::Thingie /;
 # ABSTRACT: LiveJournal friend class
 # VERSION
 
+=head1 SYNOPSIS
+
+ use WebService::LiveJournal;
+ my $client = WebService::LiveJournal->new(
+   username => $user,
+   password => $pass,
+ );
+ 
+ # get the list of your friends
+ foreach my $friend (@{ $client->get_friend })
+ {
+   # $friend isa WS::LJ::Friend
+   ...
+ }
+ 
+ # get the list of your stalkers, er... I mean people who have you as a friend:
+ foreach my $friend (@{ $client->get_friend_of })
+ {
+   # $friend isa WS::LJ::Friend
+   ...
+ }
+
+=head1 DESCRIPTION
+
+This class represents a friend or user on the LiveJournal server.
+
+=cut
+
 sub new
 {
   my $ob = shift;
@@ -24,6 +52,34 @@ sub new
 
   return $self;
 }
+
+=head1 ATTRIBUTES
+
+=head2 username
+
+The name of the user
+
+=head2 fullname
+
+The full name (First Last) of the user
+
+=head2 bgcolor
+
+The background color for the user
+
+=head2 fgcolor
+
+The foreground color for the user
+
+=head2 type
+
+The type of user
+
+=head2 mask
+
+The group mask of the user
+
+=cut
 
 sub name { shift->username(@_) }
 sub username { $_[0]->{username} }

@@ -31,7 +31,11 @@ same thing with the old interface
  my $client = WebService::LiveJournal::Client->new( username => 'foo', password => 'bar' );
  die "connection error: $WebService::LiveJournal::Client::error" unless defined $client;
 
-see L<WebService::LiveJournal::Event> for creating/updating LiveJournal events.
+See L<WebService::LiveJournal::Event> for creating/updating LiveJournal events.
+
+See L<WebService::LiveJournal::Friend> for making queries about friends.
+
+See L<WebService::LiveJournal::FriendGroup> for getting your friend groups.
 
 =head1 DESCRIPTION
 
@@ -201,44 +205,44 @@ sub new    # arg: server, port, username, password, mode
 
 These attributes are read-only.
 
-=head2 $client-E<gt>server
+=head2 server
 
 The name of the LiveJournal server
 
-=head2 $client-E<gt>port
+=head2 port
 
 The port used to connect to LiveJournal with
 
-=head2 $client-E<gt>username
+=head2 username
 
 The username used to connect to LiveJournal
 
-=head2 $client-E<gt>userid
+=head2 userid
 
 The LiveJournal userid of the user used to connect to LiveJournal.
 This is an integer.
 
-=head2 $client-E<gt>fullname
+=head2 fullname
 
 The fullname of the user used to connect to LiveJournal as LiveJournal understands it
 
-=head2 $client-E<gt>usejournals
+=head2 usejournals
 
 List of shared/news/community journals that the user has permission to post in.
 
-=head2 $client-E<gt>message
+=head2 message
 
 Message that should be displayed to the end user, if present.
 
-=head2 $client-E<gt>useragent
+=head2 useragent
 
 Instance of L<LWP::UserAgent> used to connect to LiveJournal
 
-=head2 $client-E<gt>cookie_jar
+=head2 cookie_jar
 
 Instance of L<HTTP::Cookies> used to connect to LiveJournal with
 
-=head2 $client-E<gt>fastserver
+=head2 fastserver
 
 True if you have a paid account and are entitled to use the
 fast server mode.
@@ -442,6 +446,110 @@ sub get_event
 # legacy
 sub getevent { shift->get_event(@_) }
 
+=head2 $client-E<gt>get_friends( %options )
+
+Returns friend information associated with the account with which you are logged in.
+
+=over 4
+
+=item complete
+
+If true returns your friends, stalkers (users who have you as a friend) and friend groups
+
+ # $friends is a WS::LJ::FriendList containing your friends
+ # $friend_of is a WS::LJ::FriendList containing your stalkers
+ # $groups is a WS::LJ::FriendGroupList containing your friend groups
+ my($friends, $friend_of, $groups) = $client-E<gt>get_friends( complete => 1 );
+
+If false (the default) only your friends will be returned
+
+ # $friends is a WS::LJ::FriendList containing your friends
+ my $friends = $client-E<gt>get_friends;
+
+=item friendlimit
+
+If set to a numeric value greater than zero, this mode will only return the number of results indicated. 
+
+=back
+
+=cut
+
+sub get_friends
+{
+  my $self = shift;
+  my %arg = @_;
+  my @list;
+  push @list, friendlimit => new RPC::XML::int($arg{friendlimit}) if defined $arg{friendlimit};
+  push @list, friendlimit => new RPC::XML::int($arg{limit}) if defined $arg{limit};
+  push @list, includefriendof => 1, includegroups => 1 if $arg{complete};
+  my $response = $self->send_request('getfriends', @list);
+  return unless defined $response;
+  if($arg{complete})
+  {
+    return (new WebService::LiveJournal::FriendList(response_list => $response->value->{friends}),
+      new WebService::LiveJournal::FriendList(response_list => $response->value->{friendofs}),
+      new WebService::LiveJournal::FriendGroupList(response => $response),
+    );
+  }
+  else
+  {
+    return new WebService::LiveJournal::FriendList(response => $response);
+  }
+}
+
+sub getfriends { shift->get_friends(@_) }
+
+=head2 $client-E<gt>get_friend_of( %options )
+
+Returns the list of users that are a friend of the logged in account.
+
+Returns an instance of L<WebService::LiveJournal::FriendList>, a list of
+L<WebService::LiveJournal::Friend>.
+
+Options:
+
+=over 4
+
+=item friendoflimit
+
+If set to a numeric value greater than zero, this mode will only return the number of results indicated
+
+=back
+
+=cut
+
+sub get_friend_of
+{
+  my $self = shift;
+  my %arg = @_;
+  my @list;
+  push @list, friendoflimit => new RPC::XML::int($arg{friendoflimit}) if defined $arg{friendoflimit};
+  push @list, friendoflimit => new RPC::XML::int($arg{limit}) if defined $arg{limit};
+  my $response = $self->send_request('friendof', @list);
+  return unless defined $response;
+  return new WebService::LiveJournal::FriendList(response => $response);
+}
+
+sub friendof { shift->get_friend_of(@_) }
+
+=head2 $client-E<gt>get_friend_groups
+
+Returns your friend groups.  This comes as an instance of
+L<WebService::LiveJournal::FriendGroupList> that contains
+zero or more instances of L<WebService::LiveJournal::FriendGroup>.
+
+=cut
+
+sub get_friend_groups
+{
+  my $self = shift;
+  my $response = $self->send_request('getfriendgroups');
+  return unless defined $response;
+  return new WebService::LiveJournal::FriendGroupList(response => $response);
+}
+
+sub getfriendgroups { shift->get_friend_groups(@_) }
+
 =head2 $client-E<gt>set_cookie( $key => $value )
 
 This method allows you to set a cookie for the appropriate security and expiration information.
@@ -618,55 +726,6 @@ sub _post
   return \%h;
 }
 
-# FIXME test/doco
-
-sub friendof
-{
-  my $self = shift;
-  my %arg = @_;
-  my @list;
-  push @list, friendoflimit => new RPC::XML::int($arg{friendoflimit}) if defined $arg{friendoflimit};
-  push @list, friendoflimit => new RPC::XML::int($arg{limit}) if defined $arg{limit};
-  my $response = $self->send_request('friendof', @list);
-  return unless defined $response;
-  return new WebService::LiveJournal::FriendList(response => $response);
-}
-
-# FIXME test/doco
-
-sub getfriends
-{
-  my $self = shift;
-  my %arg = @_;
-  my @list;
-  push @list, friendlimit => new RPC::XML::int($arg{friendlimit}) if defined $arg{friendlimit};
-  push @list, friendlimit => new RPC::XML::int($arg{limit}) if defined $arg{limit};
-  push @list, includefriendof => 1, includegroups => 1 if $arg{complete};
-  my $response = $self->send_request('getfriends', @list);
-  return unless defined $response;
-  if($arg{complete})
-  {
-    return (new WebService::LiveJournal::FriendList(response_list => $response->value->{friends}),
-      new WebService::LiveJournal::FriendList(response_list => $response->value->{friendofs}),
-      new WebService::LiveJournal::FriendGroupList(response => $response),
-    );
-  }
-  else
-  {
-    return new WebService::LiveJournal::FriendList(response => $response);
-  }
-}
-
-# FIXME test/doco
-
-sub getfriendgroups
-{
-  my $self = shift;
-  my $response = $self->send_request('getfriendgroups');
-  return unless defined $response;
-  return new WebService::LiveJournal::FriendGroupList(response => $response);
-}
-
 sub as_string
 {
   my $self = shift;
@@ -675,7 +734,7 @@ sub as_string
   "[ljclient $username\@$server]";
 }
 
-# FIXME test/doco
+# TODO maybe test/doco
 
 sub findallitemid
 {
@@ -773,7 +832,7 @@ sub _clear_error
 
 Returns the last error.  This just returns
 $WebService::LiveJournal::Client::error, so it
-is still a global, but is a slightly safer shoortcut.
+is still a global, but is a slightly safer shortcut.
 
  my $event = $client->get_event($itemid) || die $client->error;
 

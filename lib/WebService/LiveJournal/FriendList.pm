@@ -9,6 +9,14 @@ our @ISA = qw/ WebService::LiveJournal::List /;
 # ABSTRACT: List of LiveJournal friends
 # VERSION
 
+=head1 DESCRIPTION
+
+List of friends returned from L<WebService::LiveJournal>.
+See L<WebService::LiveJournal::Friend> for how to use
+this class.
+
+=cut
+
 sub init
 {
   my $self = shift;

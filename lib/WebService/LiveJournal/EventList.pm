@@ -26,7 +26,6 @@ our @ISA = qw/ WebService::LiveJournal::List /;
    ...
  }
 
-
 =head1 DESCRIPTION
 
 This class represents a list of LiveJournal events.  It can be used

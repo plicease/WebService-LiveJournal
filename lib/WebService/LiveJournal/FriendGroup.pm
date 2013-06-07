@@ -8,6 +8,24 @@ our @ISA = qw/ WebService::LiveJournal::Thingie /;
 # ABSTRACT: LiveJournal friend group class
 # VERSION
 
+=head1 SYNOPSIS
+
+ use WebService::LiveJournal;
+ my $client = WebService::LiveJournal->new(
+   username => $user,
+   password => $pass,
+ );
+ 
+ foreach my $group (@{ $client->get_friend_groups })
+ {
+   # $group isa WS::LJ::FriendGroup
+   ...
+ }
+
+=head1 DESCRIPTION
+
+=cut
+
 sub new
 {
   my $ob = shift;
@@ -20,6 +38,18 @@ sub new
   $self->{sortorder} = $arg{sortorder};
   return $self;
 }
+
+=head1 ATTRIBUTES
+
+=head2 $group-E<gt>public
+
+=head2 $group-E<gt>name
+
+=head2 $group-E<gt>id
+
+=head2 $group-E<gt>sortorder
+
+=cut
 
 sub public { $_[0]->{public} }
 sub name { $_[0]->{name} }
