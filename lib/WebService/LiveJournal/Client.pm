@@ -769,6 +769,21 @@ sub _clear_error
   undef $error;
 }
 
+=head2 $client-E<gt>error
+
+Returns the last error.  This just returns
+$WebService::LiveJournal::Client::error, so it
+is still a global, but is a slightly safer shoortcut.
+
+ my $event = $client->get_event($itemid) || die $client->error;
+
+It is still better to use the newer interface which throws
+an exception for any error.
+ 
+=cut
+
+sub error { $error }
+
 1;
 
 =head1 HISTORY

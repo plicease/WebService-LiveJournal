@@ -11,6 +11,7 @@ use base qw( WebService::LiveJournal::Client );
 sub _set_error
 {
   my($self, $message) = @_;
+  $self->SUPER::_set_error($message);
   die $message;
 }
 

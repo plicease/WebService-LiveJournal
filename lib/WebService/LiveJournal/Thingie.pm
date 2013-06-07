@@ -14,6 +14,8 @@ sub client
   $self->{client};
 }
 
+sub error { shift->client->error }
+
 1;
 
 =head1 SEE ALSO

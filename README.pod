@@ -257,6 +257,17 @@ On success returns the appropriate response.
 This method signals an error depending on the interface
 selected by throwing an exception or returning undef.
 
+=head2 $client-E<gt>error
+
+Returns the last error.  This just returns
+$WebService::LiveJournal::Client::error, so it
+is still a global, but is a slightly safer shoortcut.
+
+ my $event = $client->get_event($itemid) || die $client->error;
+
+It is still better to use the newer interface which throws
+an exception for any error.
+
 =head1 HISTORY
 
 The code in this distribution was written many years ago to sync my website
