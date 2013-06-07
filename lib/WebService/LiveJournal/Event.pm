@@ -85,6 +85,7 @@ sub new
   $self->{allowmask} = $arg{allowmask} if defined $arg{allowmask};
   $self->{usejournal} = $arg{usejournal} if defined $arg{usejournal};
   $self->{client} = $arg{client};
+  $self->{props}->{picture_keyword} = $arg{picture} if defined $arg{picture};
 
   $self->{year} = $arg{year} if defined $arg{year}; 
   $self->{month} = $arg{month} if defined $arg{month}; 
@@ -252,6 +253,25 @@ sub allowmask
   my $value = shift;
   $self->{allowmask} = $value if defined $value;
   $self->{allowmask};
+}
+
+=head2 $event-E<gt>picture
+
+The picture tag to use for this entry.  Each icon picture
+may have one or more tags, you can select it by using any
+one of those tags for this attribute.
+
+=cut
+
+sub picture
+{
+  my $self = shift;
+  my $value = shift;
+  if(defined $value)
+  {
+    $self->{props}->{picture_keyword} = $value;
+  }
+  $self->{props}->{picture_keyword};
 }
 
 =head2 $event-E<gt>itemid
@@ -585,17 +605,6 @@ sub access
     return ('grops', @list);
     
   }
-}
-
-sub picture
-{
-  my $self = shift;
-  my $value = shift;
-  if(defined $value)
-  {
-    $self->{props}->{picture_keyword} = $value;
-  }
-  $self->{props}->{picture_keyword};
 }
 
 sub eventtime
