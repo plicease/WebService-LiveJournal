@@ -25,7 +25,7 @@ sub new
   return $self;
 }
 
-sub name { username(@_) }
+sub name { shift->username(@_) }
 sub username { $_[0]->{username} }
 sub fullname { $_[0]->{fullname} }
 sub bgcolor { $_[0]->{bgcolor} }

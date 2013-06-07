@@ -561,50 +561,95 @@ sub htmlid
 
 sub name { itemid(@_) }
 
+=head2 $event-E<gt>set_access([ 'public' | 'private' | 'friends' ])
+
+=head2 $event-E<gt>set_access('group', @group_list)
+
+Set the access for the event.  The first argument is the type:
+
+=over 4
+
+=item public
+
+Entry will be readable by anyone
+
+=item private
+
+Entry will be readable only by the journal owner
+
+=item friends
+
+Entry will be readable only by the journal owner's friends
+
+=item group
+
+Entry will be readable only by the members of the given groups.
+
+=back
+
+=cut
+
+sub set_access
+{
+  my($self, $type, @groups) = @_;
+
+  if($type =~ /^(?:public|private)$/)
+  {
+    $self->security($type);
+  }
+  elsif($type eq 'groups')
+  {
+    my $mask = 0;
+    foreach my $group (@_)
+    {
+      $mask |= $group->mask;
+    }
+    $self->security('usemask');
+    $self->allowmask($mask);
+  }
+  elsif($type eq 'friends')
+  {
+    $self->security('usemask');
+    $self->allowmask(1);
+  }
+  return ($type, @groups);
+}
+
+=head2 get_access
+
+Returns the access informaton for the entry.  It will always return the type
+as defined above in the C<set_access> method.  In addition for the C<group>
+type the list of groups will also be returned:
+
+ my($type, @groups) = $event-E<gt>get_access
+
+=cut
+
+sub get_access
+{
+  my($self) = @_;
+  
+  my $security = $self->security;
+  return $security if $security =~ /^(?:public|private)$/;
+  my $allowmask = $self->allowmask;
+  return 'friends' if $allowmask == 1;
+  my $groups = $self->client->getfriendgroups;
+  my @list;
+  foreach my $group (@{ $groups })
+  {
+    my $mask = $group->mask;
+    no warnings;
+    push @list, $group if $mask & $allowmask == $mask;
+  }
+  return ('grops', @list);
+}
+
+# legacy
 sub access
 {
   my $self = shift;
   my $type = shift;
-  if(defined $type)
-  {
-    if($type =~ /^(?:public|private)$/)
-    {
-      $self->security($type);
-    }
-    elsif($type eq 'groups')
-    {
-      my $mask = 0;
-      foreach my $group (@_)
-      {
-        $mask |= $group->mask;
-      }
-      $self->security('usemask');
-      $self->allowmask($mask);
-    }
-    elsif($type eq 'friends')
-    {
-      $self->security('usemask');
-      $self->allowmask(1);
-    }
-    return ($type, @_);
-  }
-  else
-  {
-    my $security = $self->security;
-    return $security if $security =~ /^(?:public|private)$/;
-    my $allowmask = $self->allowmask;
-    return 'friends' if $allowmask == 1;
-    my $groups = $self->client->getfriendgroups;
-    my @list;
-    foreach my $group (@{ $groups })
-    {
-      my $mask = $group->mask;
-      no warnings;
-      push @list, $group if $mask & $allowmask == $mask;
-    }
-    return ('grops', @list);
-    
-  }
+  defined $type ? $self->set_access(@_) : $self->get_access;
 }
 
 sub eventtime

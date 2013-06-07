@@ -18,6 +18,6 @@ sub client
 
 =head1 SEE ALSO
 
-L<WebService::LiveJournal>,
+L<WebService::LiveJournal>
 
 =cut

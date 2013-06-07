@@ -9,17 +9,11 @@ print "pass: ";
 my $password = <STDIN>;
 chomp $password;
 
-my $client = WebService::LiveJournal::Client->new(
+my $client = WebService::LiveJournal->new(
   server => 'www.livejournal.com',
   username => $user,
   password => $password,
 );
-
-unless(defined $client)
-{
-  print "connect error: $WebService::LiveJournal::Client::error\n";
-  exit;
-}
 
 print "$client\n";
 

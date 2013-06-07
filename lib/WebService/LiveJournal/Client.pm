@@ -238,6 +238,11 @@ Instance of L<LWP::UserAgent> used to connect to LiveJournal
 
 Instance of L<HTTP::Cookies> used to connect to LiveJournal with
 
+=head2 $client-E<gt>fastserver
+
+True if you have a paid account and are entitled to use the
+fast server mode.
+
 =cut
 
 foreach my $name (qw( server username port userid fullname usejournals fastserver cachefriendgroups message cookie_jar ))
@@ -613,6 +618,8 @@ sub _post
   return \%h;
 }
 
+# FIXME test/doco
+
 sub friendof
 {
   my $self = shift;
@@ -624,6 +631,8 @@ sub friendof
   return unless defined $response;
   return new WebService::LiveJournal::FriendList(response => $response);
 }
+
+# FIXME test/doco
 
 sub getfriends
 {
@@ -648,6 +657,8 @@ sub getfriends
   }
 }
 
+# FIXME test/doco
+
 sub getfriendgroups
 {
   my $self = shift;
@@ -663,6 +674,8 @@ sub as_string
   my $server = $self->server;
   "[ljclient $username\@$server]";
 }
+
+# FIXME test/doco
 
 sub findallitemid
 {

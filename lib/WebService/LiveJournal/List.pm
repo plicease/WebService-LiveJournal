@@ -7,6 +7,15 @@ use overload '""' => sub { $_[0]->as_string }, '@{}' => sub { $_[0]->{list} };
 # ABSTRACT: List base class for WebService::LiveJournal
 # VERSION
 
+=head1 DESCRIPTION
+
+This class is used as the base class for a number of
+list classes included with the L<WebService::LiveJournal>
+distribution.  You shouldn't need to interact with it
+directly.
+
+=cut
+
 sub new
 {
   my $ob = shift;
@@ -45,6 +54,6 @@ sub find
 
 =head1 SEE ALSO
 
-L<WebService::LiveJournal>,
+L<WebService::LiveJournal>
 
 =cut
