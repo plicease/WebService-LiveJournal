@@ -22,7 +22,25 @@ our @ISA = qw/ WebService::LiveJournal::Thingie /;
    ...
  }
 
+Allow only members of groups "group1" and "group2" to read an event
+specified by C<$itemid>:
+
+ use WebService::LiveJournal;
+ my $client = WebService::LiveJournal->new(
+   username => $user,
+   password => $pass,
+ );
+ 
+ my(@groups) = grep { $_->name =~ /^group[12]$/ } @{ $client->get_friend_groups };
+ 
+ my $event = $client->get_event($itemid);
+ $event->set_access('group', @groups);
+ $event->update;
+
 =head1 DESCRIPTION
+
+This class represents a friend group on the LiveJournal server.
+Friend groups can be used to restrict the readability of events.
 
 =cut
 
@@ -41,13 +59,20 @@ sub new
 
 =head1 ATTRIBUTES
 
-=head2 $group-E<gt>public
+=head2 name
 
-=head2 $group-E<gt>name
+The name of the group.
 
-=head2 $group-E<gt>id
+=head2 id
 
-=head2 $group-E<gt>sortorder
+The LiveJournal internal id for the friend groups.
+Friend groups are unique to a user, not to the server
+itself, so to get a unique key you must combine
+the user and the friend group id.
+
+=head2 public
+
+=head2 sortorder
 
 =cut
 
@@ -64,6 +89,14 @@ sub as_string {
   my $bin = sprintf "%b", $mask;
   "[friendgroup $name ($id $mask $bin)]"; 
 }
+
+=head2 mask
+
+The mask used to compute the usemask when setting
+the access control on the event.  Normally you should
+not need to use this directly.
+
+=cut
 
 sub mask
 {
