@@ -487,7 +487,13 @@ sub as_string
   "[event $subject]";
 }
 
-sub gettags
+=head2 $event-E<gt>get_tags
+
+Returns the tags for the event as a list.
+
+=cut
+
+sub get_tags
 {
   my $self = shift;
   if(defined $self->{props}->{taglist})
@@ -500,12 +506,23 @@ sub gettags
   }
 }
 
-sub settags
+# legacy
+sub gettags { shift->get_tags(@_) }
+
+=head2 $event-E<gt>set_tags( @new_tags )
+
+Set the tags for the event.
+
+=cut
+
+sub set_tags
 {
   my $self = shift;
   my $tags = join ', ', @_;
   $self->{props}->{taglist} = $tags;
 }
+
+sub settags { shift->set_tags(@_) }
 
 
 sub htmlid
