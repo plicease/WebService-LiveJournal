@@ -12,7 +12,6 @@ use WebService::LiveJournal::FriendGroupList;
 use WebService::LiveJournal::Event;
 use WebService::LiveJournal::EventList;
 use HTTP::Cookies;
-use YAML::XS qw( Dump );
 use constant DEBUG => 0;
 
 # ABSTRACT: Interface to the LiveJournal API
@@ -597,12 +596,12 @@ sub send_request
   my $count = $self->{count} || 1;
   my $procname = shift;
         
-        if(DEBUG)
-        {
-          my %args = @_;
-          %args = map { ($_ => $args{$_}->value) } keys %args;
-          say Dump({ request => { $procname => \%args } });
-        }
+        #if(DEBUG)
+        #{
+        #  my %args = @_;
+        #  %args = map { ($_ => $args{$_}->value) } keys %args;
+        #  #say Dump({ request => { $procname => \%args } });
+        #}
   
   my @challenge;
   if($self->{mode} eq 'challenge')
@@ -662,10 +661,10 @@ sub send_request
   my $response = $self->{client}->send_request($request);
   if(ref $response)
   {
-                if(DEBUG)
-                {
-                  say Dump({ response => $response->value });
-                }
+                #if(DEBUG)
+                #{
+                #  say Dump({ response => $response->value });
+                #}
     if($response->is_fault)
     {
       my $string = $response->value->{faultString};
@@ -678,10 +677,10 @@ sub send_request
   }
   else
   {
-                if(DEBUG)
-                {
-                  say Dump({ error => $response });
-                }
+                #if(DEBUG)
+                #{
+                #  say Dump({ error => $response });
+                #}
     if($count < 5 && $response =~ /HTTP server error: Method Not Allowed/i)
     {
       $self->{count} = $count+1;
