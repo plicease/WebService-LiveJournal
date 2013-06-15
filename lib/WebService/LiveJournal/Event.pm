@@ -341,6 +341,14 @@ sub update
   }
 }
 
+=head2 $event-E<gt>save
+
+An alias for update.
+
+=cut
+
+sub save { shift->update(@_) }
+
 =head2 $event-E<gt>delete
 
 Remove the event on the LiveJournal server.
