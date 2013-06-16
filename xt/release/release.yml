@@ -32,6 +32,8 @@ pod_spelling_system:
     - bgcolor
     - fgcolor
     - sortorder
+    - www
+    - livejournal
 
 pod_coverage:
   # format is "Class#method" or "Class", regex allowed

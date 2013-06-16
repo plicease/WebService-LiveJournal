@@ -445,6 +445,115 @@ sub get_event
 # legacy
 sub getevent { shift->get_event(@_) }
 
+=head2 $client-E<gt>sync_items( [ last_sync =E<gt> $time ], $cb )
+
+Fetch all of the items which have been created/modified since the last sync.
+If C<last_sync =E<gt> $time> is not provided then it will fetch all events.
+For each item that has been changed it will call the code reference C<$cb>
+with three arguments:
+
+ $cb->($action, $type, $id)
+
+=over 4
+
+=item action
+
+One of C<create> or C<update>
+
+=item type
+
+For "events" (journal entries) this is C<L>
+
+=item id
+
+The internal LiveJournal server id for the item.  An integer.
+For events, the actual event can be fetched using the C<get_event>
+method.
+
+=back
+
+If the callback throws an exception, then no more entries will be processed.
+If the callback does not throw an exception, then the next item will be
+processed.
+
+This method returns the time of the last entry successfully processed, which
+can be passed into C<sync_item> the next time to only get the items that have
+changed since the first time.
+
+Here is a broad example:
+
+ # first time:
+ my $time = $client->sync_items(sub {
+   my($action, $type, $id) = @_;
+   if($type eq 'L')
+   {
+     my $event = $client->get_item($id);
+     # ...
+     if(error condition)
+     {
+       die 'error happened';
+     }
+   }
+ });
+ 
+ # if an error happened during the sync
+ my $error = $client->error;
+ 
+ # next time:
+ $time = $client->sync_items(last_sync => $time, sub {
+   ...
+ });
+
+Because the C<syncitems> rpc that this method depends on
+can make several requests before it completes it can fail
+half way through.  If this happens, you can restart where
+the last successful item was processed by passing the
+return value back into C<sync_items> again.  You can tell
+that C<sync_item> completed without error because the 
+C<$client-E<gt>error> accessor should return a false value.
+ 
+=cut
+
+sub sync_items
+{
+  my $self = shift;
+  my $cb = sub {};
+  $cb = pop if ref($_[-1]) eq 'CODE';
+  my %arg = @_;
+  
+  my $return_time;
+  
+  my @req_args = ();
+  if(defined $arg{last_sync})
+  {
+    @req_args = ( lastsync => $arg{last_sync} );
+    $return_time = $arg{last_sync};
+  }
+  
+  eval {
+    while(1)
+    {
+      my $response = $self->send_request('syncitems', @req_args);
+      last unless defined $response;
+      my $count = $response->value->{count};
+      my $total = $response->value->{total};
+      foreach my $item (@{ $response->value->{syncitems} })
+      {
+        unless($item->{item} =~ /^(.)-(\d+)$/)
+        {
+          die 'internal error: ' . $item->{item} . ' does not match';
+        }
+        $cb->($item->{action}, $1, $2);
+        $return_time = $item->{time};
+      }
+      last if $count == $total;
+      @req_args = ( lastsync => $arg{return_time} );
+    };
+  };
+  $WebService::LiveJournal::Client::error = $@ if $@;
+  return $return_time;
+}
+
 =head2 $client-E<gt>get_friends( %options )
 
 Returns friend information associated with the account with which you are logged in.
@@ -731,47 +840,6 @@ sub as_string
   my $username = $self->username;
   my $server = $self->server;
   "[ljclient $username\@$server]";
-}
-
-sub sync_items
-{
-  my $self = shift;
-  my $cb = sub {};
-  $cb = pop if ref($_[-1]) eq 'CODE';
-  my %arg = @_;
-  
-  my $return_time;
-  
-  my @req_args = ();
-  if(defined $arg{last_sync})
-  {
-    @req_args = ( lastsync => $arg{last_sync} );
-    $return_time = $arg{last_sync};
-  }
-  
-  eval {
-    while(1)
-    {
-      say "sync items @req_args";
-      my $response = $self->send_request('syncitems', @req_args);
-      last unless defined $response;
-      my $count = $response->value->{count};
-      my $total = $response->value->{total};
-      foreach my $item (@{ $response->value->{syncitems} })
-      {
-        unless($item->{item} =~ /^(.)-(\d+)$/)
-        {
-          die 'internal error: ' . $item->{item} . ' does not match';
-        }
-        $cb->($item->{action}, $1, $2);
-        $return_time = $item->{time};
-      }
-      last if $count == $total;
-      @req_args = ( lastsync => $arg{return_time} );
-    };
-  };
-  $WebService::LiveJournal::Client::error = $@ if $@;
-  return $return_time;
 }
 
 sub findallitemid
