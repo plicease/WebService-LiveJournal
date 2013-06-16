@@ -1,4 +1,6 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.02      2013-06-16 12:48:49 EST5EDT
   - added sync_items method
