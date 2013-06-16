@@ -1,4 +1,4 @@
 Revision history for {{$dist->name}}
 
-{{$NEXXT}}
-  - initial version
+{{$NEXT}}
+  - added sync_items method
