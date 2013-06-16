@@ -743,11 +743,16 @@ sub sync_items
   my $return_time;
   
   my @req_args = ();
-  @req_args = ( lastsync => $arg{last_sync} ) if defined $arg{last_sync};
+  if(defined $arg{last_sync})
+  {
+    @req_args = ( lastsync => $arg{last_sync} );
+    $return_time = $arg{last_sync};
+  }
   
   eval {
     while(1)
     {
+      say "sync items @req_args";
       my $response = $self->send_request('syncitems', @req_args);
       last unless defined $response;
       my $count = $response->value->{count};
