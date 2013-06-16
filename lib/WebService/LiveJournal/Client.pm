@@ -733,7 +733,41 @@ sub as_string
   "[ljclient $username\@$server]";
 }
 
-# TODO maybe test/doco
+sub sync_items
+{
+  my $self = shift;
+  my $cb = sub {};
+  $cb = pop if ref($_[-1]) eq 'CODE';
+  my %arg = @_;
+  
+  my $return_time;
+  
+  my @req_args = ();
+  @req_args = ( lastsync => $arg{last_sync} ) if defined $arg{last_sync};
+  
+  eval {
+    while(1)
+    {
+      my $response = $self->send_request('syncitems', @req_args);
+      last unless defined $response;
+      my $count = $response->value->{count};
+      my $total = $response->value->{total};
+      foreach my $item (@{ $response->value->{syncitems} })
+      {
+        unless($item->{item} =~ /^(.)-(\d+)$/)
+        {
+          die 'internal error: ' . $item->{item} . ' does not match';
+        }
+        $cb->($item->{action}, $1, $2);
+        $return_time = $item->{time};
+      }
+      last if $count == $total;
+      @req_args = ( lastsync => $arg{return_time} );
+    };
+  };
+  $WebService::LiveJournal::Client::error = $@ if $@;
+  return $return_time;
+}
 
 sub findallitemid
 {
