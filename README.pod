@@ -388,6 +388,125 @@ is still a global, but is a slightly safer shortcut.
 It is still better to use the newer interface which throws
 an exception for any error.
 
+=head1 EXAMPLES
+
+These examples are included with the distribution in its 'example' directory.
+
+Here is a simple example of how you would login/authenticate with a 
+LiveJournal server:
+
+ use strict;
+ use warnings;
+ use WebService::LiveJournal::Client;
+ 
+ print "user: ";
+ my $user = <STDIN>;
+ chomp $user;
+ print "pass: ";
+ my $password = <STDIN>;
+ chomp $password;
+ 
+ my $client = WebService::LiveJournal->new(
+   server => 'www.livejournal.com',
+   username => $user,
+   password => $password,
+ );
+ 
+ print "$client\n";
+ 
+ if($client->fastserver)
+ {
+   print "fast server\n";
+ }
+ else
+ {
+   print "slow server\n";
+ }
+
+Here is a simple example showing how you can post an entry to your 
+LiveJournal:
+
+ use strict;
+ use warnings;
+ use WebService::LiveJournal::Client;
+ 
+ print "user: ";
+ my $user = <STDIN>;
+ chomp $user;
+ print "pass: ";
+ my $password = <STDIN>;
+ chomp $password;
+ 
+ 
+ my $client = WebService::LiveJournal->new(
+   server => 'www.livejournal.com',
+   username => $user,
+   password => $password,
+ );
+ 
+ print "subject: ";
+ my $subject = <STDIN>;
+ chomp $subject;
+ 
+ print "content: (^D or EOF when done)\n";
+ my @lines = <STDIN>;
+ chomp @lines;
+ 
+ my $event = $client->create(
+   subject => $subject,
+   event => join("\n", @lines),
+ );
+ 
+ $event->update;
+ 
+ print "posted $event with $client\n";
+ print "itemid = ", $event->itemid, "\n";
+ print "url    = ", $event->url, "\n";
+ print "anum   = ", $event->anum, "\n";
+
+Here is an example of a script that will remove all entries from a 
+LiveJournal.  Be very cautious before using this script, once the 
+entries are removed they cannot be brought back from the dead:
+
+ use strict;
+ use warnings;
+ use WebService::LiveJournal::Client;
+ 
+ print "WARNING WARNING WARNING\n";
+ print "this will remove all entries in your LiveJournal account\n";
+ print "this probably cannot be undone\n";
+ print "WARNING WARNING WARNING\n";
+ 
+ print "user: ";
+ my $user = <STDIN>;
+ chomp $user;
+ print "pass: ";
+ my $password = <STDIN>;
+ chomp $password;
+ 
+ my $client = WebService::LiveJournal->new(
+   server => 'www.livejournal.com',
+   username => $user,
+   password => $password,
+ );
+ 
+ print "$client\n";
+ 
+ my $count = 0;
+ while(1)
+ {
+   my $event_list = $client->get_events('lastn', howmany => 50);
+   last unless @{ $event_list } > 0;
+   foreach my $event (@{ $event_list })
+   {
+     print "rm: ", $event->subject, "\n";
+     $event->delete;
+     $count++;
+   }
+ }
+ 
+ print "$count entries deleted\n";
+
 =head1 HISTORY
 
 The code in this distribution was written many years ago to sync my website

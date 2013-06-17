@@ -951,6 +951,26 @@ sub error { $error }
 
 1;
 
+=head1 EXAMPLES
+
+These examples are included with the distribution in its 'example' directory.
+
+Here is a simple example of how you would login/authenticate with a 
+LiveJournal server:
+
+# EXAMPLE: example/login.pl
+
+Here is a simple example showing how you can post an entry to your 
+LiveJournal:
+
+# EXAMPLE: example/post.pl
+
+Here is an example of a script that will remove all entries from a 
+LiveJournal.  Be very cautious before using this script, once the 
+entries are removed they cannot be brought back from the dead:
+
+# EXAMPLE: example/remove_all_entries.pl
+
 =head1 HISTORY
 
 The code in this distribution was written many years ago to sync my website
