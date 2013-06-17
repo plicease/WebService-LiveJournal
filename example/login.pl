@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use WebService::LiveJournal::Client;
+use WebService::LiveJournal;
 
 print "user: ";
 my $user = <STDIN>;

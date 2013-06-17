@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use WebService::LiveJournal::Client;
+use WebService::LiveJournal;
 
 print "WARNING WARNING WARNING\n";
 print "this will remove all entries in your LiveJournal account\n";

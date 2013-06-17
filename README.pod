@@ -397,7 +397,7 @@ LiveJournal server:
 
  use strict;
  use warnings;
- use WebService::LiveJournal::Client;
+ use WebService::LiveJournal;
  
  print "user: ";
  my $user = <STDIN>;
@@ -428,7 +428,7 @@ LiveJournal:
 
  use strict;
  use warnings;
- use WebService::LiveJournal::Client;
+ use WebService::LiveJournal;
  
  print "user: ";
  my $user = <STDIN>;
@@ -470,7 +470,7 @@ entries are removed they cannot be brought back from the dead:
 
  use strict;
  use warnings;
- use WebService::LiveJournal::Client;
+ use WebService::LiveJournal;
  
  print "WARNING WARNING WARNING\n";
  print "this will remove all entries in your LiveJournal account\n";
