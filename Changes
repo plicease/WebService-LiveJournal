@@ -2,6 +2,9 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.05      2013-06-22 15:19:32 EST5EDT
+  - Documentation
+
 0.04      2013-06-22 08:27:16 EST5EDT
   - added $client->console_command method
   - added $client->batch_console_commands method
