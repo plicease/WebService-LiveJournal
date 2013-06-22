@@ -9,7 +9,6 @@ print "pass: ";
 my $password = <STDIN>;
 chomp $password;
 
-
 my $client = WebService::LiveJournal->new(
   server => 'www.livejournal.com',
   username => $user,

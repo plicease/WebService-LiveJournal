@@ -729,6 +729,9 @@ sub batch_console_commands
     commands => RPC::XML::array->new(@commands)
   );
   return unless defined $response;
+
+  # also returned is 'success' but as far as I can tell it is always
+  # 1, even if the command doesn't exist.  so we are ignoring it.
   
   foreach my $output (map { $_->{output} } @{ $response->value->{results} })
   {
@@ -1030,6 +1033,12 @@ LiveJournal.  Be very cautious before using this script, once the
 entries are removed they cannot be brought back from the dead:
 
 # EXAMPLE: example/remove_all_entries.pl
+
+Here is a really simple command line interface to the LiveJournal
+admin console.  Obvious improvements like better parsing of the commands
+and not displaying the password are left as an exercise to the reader.
+
+# EXAMPLE: example/console.pl
 
 =head1 HISTORY
 
