@@ -662,7 +662,7 @@ sub getfriendgroups { shift->get_friend_groups(@_) }
 Execute the given console command with the given arguments on the
 LiveJournal server.  Returns the output as a list reference.
 Each element in the list represents a line out output and consists
-of a list reference continaing the type of output and the text
+of a list reference containing the type of output and the text
 of the output.  For example:
 
  my $ret = $client->console_command( 'print', 'hello world' );
@@ -678,17 +678,65 @@ returns:
 
 sub console_command
 {
-  my($self, $command, @arguments) = @_;
+  my $self = shift;
   
   my $response = $self->send_request('consolecommand',
     commands => RPC::XML::array->new(
       RPC::XML::array->new(
-        map { RPC::XML::string->new($_) } $command, @arguments
+        map { RPC::XML::string->new($_) } @_
       ),
     ),
   );
   return unless defined $response;
   return $response->value->{results}->[0]->{output};
+}
+
+=head2 $client-E<gt>batch_console_commands( $command1, $callback, [ $command2, $callback, [ ... ] )
+
+Execute a list of commands on the LiveJournal server in one request. Each command is a list reference. Each callback 
+associated with each command will be called with the results of that command (in the same format returned by 
+C<console_command> mentioned above, except it is passed in as a list instead of a list reference).  Example:
+
+ $client->batch_console_commands(
+   [ 'print', 'something to print' ],
+   sub {
+     my @output = @_;
+     ...
+   },
+   [ 'print', 'something else to print' ],
+   sub {
+     my @output = @_;
+     ...
+   },
+ );
+
+=cut
+
+sub batch_console_commands
+{
+  my $self = shift;
+  my @commands;
+  my @cb;
+  for(0..$#_)
+  {
+    if($_ % 2)
+    { push @cb, $_[$_] }
+    else
+    { push @commands, RPC::XML::array->new(map { RPC::XML::string->new($_) } @{ $_[$_] }) }
+  }
+  
+  my $response = $self->send_request('consolecommand',
+    commands => RPC::XML::array->new(@commands)
+  );
+  return unless defined $response;
+  
+  foreach my $output (map { $_->{output} } @{ $response->value->{results} })
+  {
+    my $cb = shift @cb;
+    $cb->(@$output);
+  }
+  
+  return 1;
 }
 
 =head2 $client-E<gt>set_cookie( $key => $value )
