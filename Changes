@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+  - added $client->console_command method
 
 0.03      2013-06-17 06:33:58 America/New_York
   - Documentation

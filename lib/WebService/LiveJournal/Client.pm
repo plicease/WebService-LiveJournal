@@ -12,7 +12,6 @@ use WebService::LiveJournal::FriendGroupList;
 use WebService::LiveJournal::Event;
 use WebService::LiveJournal::EventList;
 use HTTP::Cookies;
-use constant DEBUG => 0;
 
 # ABSTRACT: Interface to the LiveJournal API
 # VERSION
@@ -658,6 +657,40 @@ sub get_friend_groups
 
 sub getfriendgroups { shift->get_friend_groups(@_) }
 
+=head2 $client-E<gt>console_command( $command, @arguments )
+
+Execute the given console command with the given arguments on the
+LiveJournal server.  Returns the output as a list reference.
+Each element in the list represents a line out output and consists
+of a list reference continaing the type of output and the text
+of the output.  For example:
+
+ my $ret = $client->console_command( 'print', 'hello world' );
+
+returns:
+
+ [
+   [ 'info',    "Welcome to 'print'!" ],
+   [ 'success', "hello world" ],
+ ]
+
+=cut
+
+sub console_command
+{
+  my($self, $command, @arguments) = @_;
+  
+  my $response = $self->send_request('consolecommand',
+    commands => RPC::XML::array->new(
+      RPC::XML::array->new(
+        map { RPC::XML::string->new($_) } $command, @arguments
+      ),
+    ),
+  );
+  return unless defined $response;
+  return $response->value->{results}->[0]->{output};
+}
+
 =head2 $client-E<gt>set_cookie( $key => $value )
 
 This method allows you to set a cookie for the appropriate security and expiration information.
@@ -705,13 +738,6 @@ sub send_request
   my $count = $self->{count} || 1;
   my $procname = shift;
         
-        #if(DEBUG)
-        #{
-        #  my %args = @_;
-        #  %args = map { ($_ => $args{$_}->value) } keys %args;
-        #  #say Dump({ request => { $procname => \%args } });
-        #}
-  
   my @challenge;
   if($self->{mode} eq 'challenge')
   {
@@ -743,18 +769,12 @@ sub send_request
 
     # this is where we fall through down to from above
     my $auth_challenge = $response->value->{challenge};
-    #print "challenge = $auth_challenge\n";
     my $auth_response = md5_hex($auth_challenge, md5_hex($self->{password}));
     @challenge = (
       auth_method => $challenge,
       auth_challenge => new RPC::XML::string($auth_challenge),
       auth_response => new RPC::XML::string($auth_response),
     );
-    #print "challenge\n";
-  }
-  else
-  {
-    #print "cookie\n";
   }
 
   my $request = new RPC::XML::request(
@@ -770,10 +790,6 @@ sub send_request
   my $response = $self->{client}->send_request($request);
   if(ref $response)
   {
-                #if(DEBUG)
-                #{
-                #  say Dump({ response => $response->value });
-                #}
     if($response->is_fault)
     {
       my $string = $response->value->{faultString};
@@ -786,10 +802,6 @@ sub send_request
   }
   else
   {
-                #if(DEBUG)
-                #{
-                #  say Dump({ error => $response });
-                #}
     if($count < 5 && $response =~ /HTTP server error: Method Not Allowed/i)
     {
       $self->{count} = $count+1;
