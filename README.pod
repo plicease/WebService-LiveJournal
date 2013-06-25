@@ -350,6 +350,12 @@ Returns your friend groups.  This comes as an instance of
 L<WebService::LiveJournal::FriendGroupList> that contains
 zero or more instances of L<WebService::LiveJournal::FriendGroup>.
 
+=head2 $client-E<gt>get_user_tags( [ $journal_name ] )
+
+Fetch the tags associated with the given journal, or the users journal
+if not specified.  This method returns a list of zero or more
+L<WebService::LiveJournal::Tag> objects.
+
 =head2 $client-E<gt>console_command( $command, @arguments )
 
 Execute the given console command with the given arguments on the

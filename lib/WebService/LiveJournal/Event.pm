@@ -548,6 +548,7 @@ sub set_tags
   my $self = shift;
   my $tags = join ', ', @_;
   $self->{props}->{taglist} = $tags;
+  $self;
 }
 
 sub settags { shift->set_tags(@_) }

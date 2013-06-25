@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+  - Add get_user_tags method
 
 0.05      2013-06-22 15:19:32 EST5EDT
   - Documentation
