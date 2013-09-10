@@ -24,9 +24,9 @@ sub munge_files
     last if s{^WebService::LiveJournal::Client - }{WebService::LiveJournal - };
   }
   
-  my $readme = $self->zilla->root->file('README.pod')->absolute;
-  $readme->spew(join "\n", @pod);
-  $self->zilla->log("writing $readme");
+  #my $readme = $self->zilla->root->file('README.pod')->absolute;
+  #$readme->spew(join "\n", @pod);
+  #$self->zilla->log("writing $readme");
   
   my @nexgen = split /\n/, $nexgen->content;
   while(defined $nexgen[-1] && $nexgen[-1] ne '=pod')
