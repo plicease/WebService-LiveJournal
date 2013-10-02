@@ -1,0 +1,10 @@
+Digest::MD5
+Exporter
+ExtUtils::MakeMaker
+HTTP::Cookies
+RPC::XML
+RPC::XML::Client
+RPC::XML::ParserFactory
+Test::More
+Time::HiRes
+overload
