@@ -1,20 +1,18 @@
 use strict;
 use warnings;
 use Test::More;
-use WebService::LiveJournal::Client;
+use WebService::LiveJournal;
 
 plan skip_all => 'for live tests set TEST_WEBSERVICE_LIVEJOURNAL' unless defined $ENV{TEST_WEBSERVICE_LIVEJOURNAL};
 plan tests => 11;
 
 my($user,$pass,$server) = split /:/, $ENV{TEST_WEBSERVICE_LIVEJOURNAL};
 
-my $client = WebService::LiveJournal::Client->new(
+my $client = WebService::LiveJournal->new(
   server => $server,
   username => $user,
   password => $pass,
 );
-
-diag $WebService::LiveJournal::Client::error unless defined $client;
 
 while(1)
 {

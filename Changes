@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+  - month was off by one (gh#1)
 
 0.06      2013-06-25 16:08:36 EST5EDT
   - Add get_user_tags method

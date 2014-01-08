@@ -472,7 +472,7 @@ sub _fill_in_default_time
   &&        defined $self->{min};
   my ($sec,$min,$hour,$mday,$month,$year,$wday,$yday,$isdst) = localtime(time);
   $self->{year}  //= $year+1900;
-  $self->{month} //= $month;
+  $self->{month} //= $month+1;
   $self->{day}   //= $mday;
   $self->{hour}  //= $hour;
   $self->{min}   //= $min;
