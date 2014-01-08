@@ -15,11 +15,11 @@ same thing with the old interface
     my $client = WebService::LiveJournal::Client->new( username => 'foo', password => 'bar' );
     die "connection error: $WebService::LiveJournal::Client::error" unless defined $client;
 
-See [WebService::LiveJournal::Event](http://search.cpan.org/perldoc?WebService::LiveJournal::Event) for creating/updating LiveJournal events.
+See [WebService::LiveJournal::Event](https://metacpan.org/pod/WebService::LiveJournal::Event) for creating/updating LiveJournal events.
 
-See [WebService::LiveJournal::Friend](http://search.cpan.org/perldoc?WebService::LiveJournal::Friend) for making queries about friends.
+See [WebService::LiveJournal::Friend](https://metacpan.org/pod/WebService::LiveJournal::Friend) for making queries about friends.
 
-See [WebService::LiveJournal::FriendGroup](http://search.cpan.org/perldoc?WebService::LiveJournal::FriendGroup) for getting your friend groups.
+See [WebService::LiveJournal::FriendGroup](https://metacpan.org/pod/WebService::LiveJournal::FriendGroup) for getting your friend groups.
 
 # DESCRIPTION
 
@@ -29,11 +29,11 @@ uses a hybrid of the flat and XML-RPC API to avoid bugs in some LiveJournal depl
 
 There are two interfaces:
 
-- [WebService::LiveJournal](http://search.cpan.org/perldoc?WebService::LiveJournal)
+- [WebService::LiveJournal](https://metacpan.org/pod/WebService::LiveJournal)
 
     The new interface, where methods throw an exception on error.
 
-- [WebService::LiveJournal::Client](http://search.cpan.org/perldoc?WebService::LiveJournal::Client)
+- [WebService::LiveJournal::Client](https://metacpan.org/pod/WebService::LiveJournal::Client)
 
     The legacy interface, where methods return undef on error and
     set $WebService::LiveJournal::Client::error
@@ -107,11 +107,11 @@ Message that should be displayed to the end user, if present.
 
 ## useragent
 
-Instance of [LWP::UserAgent](http://search.cpan.org/perldoc?LWP::UserAgent) used to connect to LiveJournal
+Instance of [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) used to connect to LiveJournal
 
 ## cookie\_jar
 
-Instance of [HTTP::Cookies](http://search.cpan.org/perldoc?HTTP::Cookies) used to connect to LiveJournal with
+Instance of [HTTP::Cookies](https://metacpan.org/pod/HTTP::Cookies) used to connect to LiveJournal with
 
 ## fastserver
 
@@ -123,12 +123,12 @@ fast server mode.
 ## $client->create\_event( %options )
 
 Creates a new event and returns it in the form of an instance of
-[WebService::LiveJournal::Event](http://search.cpan.org/perldoc?WebService::LiveJournal::Event).  This does not create the 
+[WebService::LiveJournal::Event](https://metacpan.org/pod/WebService::LiveJournal::Event).  This does not create the 
 event on the LiveJournal server itself, until you use the 
 `update` methods on the event.
 
 `%options` contains a hash of attribute key, value pairs for
-the new [WebService::LiveJournal::Event](http://search.cpan.org/perldoc?WebService::LiveJournal::Event).  The only required
+the new [WebService::LiveJournal::Event](https://metacpan.org/pod/WebService::LiveJournal::Event).  The only required
 attributes are `subject` and `event`, though you may set these
 values after the event is created as long as you set them
 before you try to `update` the event.  Thus this:
@@ -154,7 +154,7 @@ selected by throwing an exception or returning undef.
 Selects events from the LiveJournal server.  The actual `%query`
 parameter requirements depend on the `$select_type`.
 
-Returns an instance of [WebService::LiveJournal::EventList](http://search.cpan.org/perldoc?WebService::LiveJournal::EventList).
+Returns an instance of [WebService::LiveJournal::EventList](https://metacpan.org/pod/WebService::LiveJournal::EventList).
 
 Select types:
 
@@ -293,8 +293,8 @@ Returns friend information associated with the account with which you are logged
 
 Returns the list of users that are a friend of the logged in account.
 
-Returns an instance of [WebService::LiveJournal::FriendList](http://search.cpan.org/perldoc?WebService::LiveJournal::FriendList), a list of
-[WebService::LiveJournal::Friend](http://search.cpan.org/perldoc?WebService::LiveJournal::Friend).
+Returns an instance of [WebService::LiveJournal::FriendList](https://metacpan.org/pod/WebService::LiveJournal::FriendList), a list of
+[WebService::LiveJournal::Friend](https://metacpan.org/pod/WebService::LiveJournal::Friend).
 
 Options:
 
@@ -305,14 +305,14 @@ Options:
 ## $client->get\_friend\_groups
 
 Returns your friend groups.  This comes as an instance of
-[WebService::LiveJournal::FriendGroupList](http://search.cpan.org/perldoc?WebService::LiveJournal::FriendGroupList) that contains
-zero or more instances of [WebService::LiveJournal::FriendGroup](http://search.cpan.org/perldoc?WebService::LiveJournal::FriendGroup).
+[WebService::LiveJournal::FriendGroupList](https://metacpan.org/pod/WebService::LiveJournal::FriendGroupList) that contains
+zero or more instances of [WebService::LiveJournal::FriendGroup](https://metacpan.org/pod/WebService::LiveJournal::FriendGroup).
 
 ## $client->get\_user\_tags( \[ $journal\_name \] )
 
 Fetch the tags associated with the given journal, or the users journal
 if not specified.  This method returns a list of zero or more
-[WebService::LiveJournal::Tag](http://search.cpan.org/perldoc?WebService::LiveJournal::Tag) objects.
+[WebService::LiveJournal::Tag](https://metacpan.org/pod/WebService::LiveJournal::Tag) objects.
 
 ## $client->console\_command( $command, @arguments )
 
@@ -359,9 +359,9 @@ You shouldn't need to call it directly, but is available here if necessary.
 
 Make a low level request to LiveJournal with the given
 `$procname` (the rpc procedure name) and `@arguments`
-(should be [RPC::XML](http://search.cpan.org/perldoc?RPC::XML) types).
+(should be [RPC::XML](https://metacpan.org/pod/RPC::XML) types).
 
-On success returns the appropriate [RPC::XML](http://search.cpan.org/perldoc?RPC::XML) type
+On success returns the appropriate [RPC::XML](https://metacpan.org/pod/RPC::XML) type
 (usually RPC::XML::struct).
 
 This method signals an error depending on the interface
@@ -565,8 +565,8 @@ its original writing the documentation for those modules was sparse or misleadin
 # SEE ALSO
 
 - [http://www.livejournal.com/doc/server/index.html](http://www.livejournal.com/doc/server/index.html),
-- [Net::LiveJournal](http://search.cpan.org/perldoc?Net::LiveJournal),
-- [LJ::Simple](http://search.cpan.org/perldoc?LJ::Simple)
+- [Net::LiveJournal](https://metacpan.org/pod/Net::LiveJournal),
+- [LJ::Simple](https://metacpan.org/pod/LJ::Simple)
 
 # AUTHOR
 
