@@ -42,7 +42,9 @@ It is recommended that for any new code that you use the new interface.
 
 # CONSTRUCTOR
 
-## WebService::LiveJournal::Client->new( %options )
+## new
+
+    my $client = WebService::LiveJournal::Client->new( %options )
 
 Connects to a LiveJournal server using the host and user information
 provided by `%options`.
@@ -120,7 +122,9 @@ fast server mode.
 
 # METHODS
 
-## $client->create\_event( %options )
+## create\_event
+
+    $client->create_event( %options )
 
 Creates a new event and returns it in the form of an instance of
 [WebService::LiveJournal::Event](https://metacpan.org/pod/WebService::LiveJournal::Event).  This does not create the 
@@ -149,7 +153,9 @@ is equivalent to this:
 This method signals an error depending on the interface
 selected by throwing an exception or returning undef.
 
-## $client->get\_events( $select\_type, %query )
+## get\_events
+
+    $client->get_events( $select_type, %query )
 
 Selects events from the LiveJournal server.  The actual `%query`
 parameter requirements depend on the `$select_type`.
@@ -197,14 +203,19 @@ Select types:
 This method signals an error depending on the interface
 selected by throwing an exception or returning undef.
 
-## $client->get\_event( $itemid )
+## get\_event
+
+    $client->get_event( $itemid )
 
 Given an `itemid` (the internal LiveJournal identifier for an event).
 
 This method signals an error depending on the interface
 selected by throwing an exception or returning undef.
 
-## $client->sync\_items( \[ last\_sync => $time \], $cb )
+## sync\_items
+
+    $client->sync_items( $cb )
+    $client->sync_items( last_sync => $time, $cb )
 
 Fetch all of the items which have been created/modified since the last sync.
 If `last_sync => $time` is not provided then it will fetch all events.
@@ -267,7 +278,9 @@ return value back into `sync_items` again.  You can tell
 that `sync_item` completed without error because the 
 `$client->error` accessor should return a false value.
 
-## $client->get\_friends( %options )
+## get\_friends
+
+    $client->get_friends( %options )
 
 Returns friend information associated with the account with which you are logged in.
 
@@ -289,7 +302,9 @@ Returns friend information associated with the account with which you are logged
 
     If set to a numeric value greater than zero, this mode will only return the number of results indicated. 
 
-## $client->get\_friend\_of( %options )
+## get\_friends\_of
+
+    $client->get_friend_of( %options )
 
 Returns the list of users that are a friend of the logged in account.
 
@@ -302,19 +317,26 @@ Options:
 
     If set to a numeric value greater than zero, this mode will only return the number of results indicated
 
-## $client->get\_friend\_groups
+## get\_friend\_groups
+
+    $client->get_friend_groups
 
 Returns your friend groups.  This comes as an instance of
 [WebService::LiveJournal::FriendGroupList](https://metacpan.org/pod/WebService::LiveJournal::FriendGroupList) that contains
 zero or more instances of [WebService::LiveJournal::FriendGroup](https://metacpan.org/pod/WebService::LiveJournal::FriendGroup).
 
-## $client->get\_user\_tags( \[ $journal\_name \] )
+## get\_user\_tags
+
+    $client->get_user_tags;
+    $client->get_user_tags( $journal_name );
 
 Fetch the tags associated with the given journal, or the users journal
 if not specified.  This method returns a list of zero or more
 [WebService::LiveJournal::Tag](https://metacpan.org/pod/WebService::LiveJournal::Tag) objects.
 
-## $client->console\_command( $command, @arguments )
+## console\_command
+
+    $client->console_command( $command, @arguments )
 
 Execute the given console command with the given arguments on the
 LiveJournal server.  Returns the output as a list reference.
@@ -331,7 +353,10 @@ returns:
       [ 'success', "hello world" ],
     ]
 
-## $client->batch\_console\_commands( $command1, $callback, \[ $command2, $callback, \[ ... \] )
+## batch\_console\_commands
+
+    $client->batch_console_commands( $command1, $callback);
+    $client->batch_console_commands( $command1, $callback, [ $command2, $callback, [ ... ] );
 
 Execute a list of commands on the LiveJournal server in one request. Each command is a list reference. Each callback 
 associated with each command will be called with the results of that command (in the same format returned by 
@@ -350,12 +375,16 @@ associated with each command will be called with the results of that command (in
       },
     );
 
-## $client->set\_cookie( $key => $value )
+## set\_cookie
+
+    $client->set_cookie( $key => $value )
 
 This method allows you to set a cookie for the appropriate security and expiration information.
 You shouldn't need to call it directly, but is available here if necessary.
 
-## $client->send\_request( $procname, @arguments )
+## send\_request
+
+    $client->send_request( $procname, @arguments )
 
 Make a low level request to LiveJournal with the given
 `$procname` (the rpc procedure name) and `@arguments`
@@ -367,7 +396,9 @@ On success returns the appropriate [RPC::XML](https://metacpan.org/pod/RPC::XML)
 This method signals an error depending on the interface
 selected by throwing an exception or returning undef.
 
-## $client->send\_flat\_request( $procname, @arguments )
+## send\_flat\_request
+
+    $client->send_flat_request( $procname, @arguments )
 
 Sends a low level request to the LiveJournal server using the flat API,
 with the given `$procname` (the rpc procedure name) and `@arguments`.
@@ -377,7 +408,9 @@ On success returns the appropriate response.
 This method signals an error depending on the interface
 selected by throwing an exception or returning undef.
 
-## $client->error
+## error
+
+    $client->error
 
 Returns the last error.  This just returns
 $WebService::LiveJournal::Client::error, so it

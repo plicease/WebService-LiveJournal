@@ -72,7 +72,9 @@ $RPC::XML::ENCODING = 'utf-8';  # uh... and WHY??? is this a global???
 
 =head1 CONSTRUCTOR
 
-=head2 WebService::LiveJournal::Client->new( %options )
+=head2 new
+
+ my $client = WebService::LiveJournal::Client->new( %options )
 
 Connects to a LiveJournal server using the host and user information
 provided by C<%options>.
@@ -258,7 +260,9 @@ sub useragent { $_[0]->{client}->useragent }
 
 =head1 METHODS
 
-=head2 $client-E<gt>create_event( %options )
+=head2 create_event
+
+ $client->create_event( %options )
 
 Creates a new event and returns it in the form of an instance of
 L<WebService::LiveJournal::Event>.  This does not create the 
@@ -299,7 +303,9 @@ sub create_event
 # legacy
 sub create { shift->create_event(@_) }
 
-=head2 $client-E<gt>get_events( $select_type, %query )
+=head2 get_events
+
+ $client->get_events( $select_type, %query )
 
 Selects events from the LiveJournal server.  The actual C<%query>
 parameter requirements depend on the C<$select_type>.
@@ -426,7 +432,9 @@ sub get_events
 # legacy
 sub getevents { shift->get_events(@_) }
 
-=head2 $client-E<gt>get_event( $itemid )
+=head2 get_event
+
+ $client->get_event( $itemid )
 
 Given an C<itemid> (the internal LiveJournal identifier for an event).
 
@@ -445,7 +453,10 @@ sub get_event
 # legacy
 sub getevent { shift->get_event(@_) }
 
-=head2 $client-E<gt>sync_items( [ last_sync =E<gt> $time ], $cb )
+=head2 sync_items
+
+ $client->sync_items( $cb )
+ $client->sync_items( last_sync => $time, $cb )
 
 Fetch all of the items which have been created/modified since the last sync.
 If C<last_sync =E<gt> $time> is not provided then it will fetch all events.
@@ -554,7 +565,9 @@ sub sync_items
   return $return_time;
 }
 
-=head2 $client-E<gt>get_friends( %options )
+=head2 get_friends
+
+ $client->get_friends( %options )
 
 Returns friend information associated with the account with which you are logged in.
 
@@ -607,7 +620,9 @@ sub get_friends
 
 sub getfriends { shift->get_friends(@_) }
 
-=head2 $client-E<gt>get_friend_of( %options )
+=head2 get_friends_of
+
+ $client->get_friend_of( %options )
 
 Returns the list of users that are a friend of the logged in account.
 
@@ -640,7 +655,9 @@ sub get_friend_of
 
 sub friendof { shift->get_friend_of(@_) }
 
-=head2 $client-E<gt>get_friend_groups
+=head2 get_friend_groups
+
+ $client->get_friend_groups
 
 Returns your friend groups.  This comes as an instance of
 L<WebService::LiveJournal::FriendGroupList> that contains
@@ -658,7 +675,10 @@ sub get_friend_groups
 
 sub getfriendgroups { shift->get_friend_groups(@_) }
 
-=head2 $client-E<gt>get_user_tags( [ $journal_name ] )
+=head2 get_user_tags
+
+ $client->get_user_tags;
+ $client->get_user_tags( $journal_name );
 
 Fetch the tags associated with the given journal, or the users journal
 if not specified.  This method returns a list of zero or more
@@ -677,7 +697,9 @@ sub get_user_tags
   return map { WebService::LiveJournal::Tag->new($_) } @{ $response->value->{tags} };
 }
 
-=head2 $client-E<gt>console_command( $command, @arguments )
+=head2 console_command
+
+ $client->console_command( $command, @arguments )
 
 Execute the given console command with the given arguments on the
 LiveJournal server.  Returns the output as a list reference.
@@ -711,7 +733,10 @@ sub console_command
   return $response->value->{results}->[0]->{output};
 }
 
-=head2 $client-E<gt>batch_console_commands( $command1, $callback, [ $command2, $callback, [ ... ] )
+=head2 batch_console_commands
+
+ $client->batch_console_commands( $command1, $callback);
+ $client->batch_console_commands( $command1, $callback, [ $command2, $callback, [ ... ] );
 
 Execute a list of commands on the LiveJournal server in one request. Each command is a list reference. Each callback 
 associated with each command will be called with the results of that command (in the same format returned by 
@@ -762,7 +787,9 @@ sub batch_console_commands
   return 1;
 }
 
-=head2 $client-E<gt>set_cookie( $key => $value )
+=head2 set_cookie
+
+ $client->set_cookie( $key => $value )
 
 This method allows you to set a cookie for the appropriate security and expiration information.
 You shouldn't need to call it directly, but is available here if necessary.
@@ -788,7 +815,9 @@ sub set_cookie
   );
 }
 
-=head2 $client-E<gt>send_request( $procname, @arguments )
+=head2 send_request
+
+ $client->send_request( $procname, @arguments )
 
 Make a low level request to LiveJournal with the given
 C<$procname> (the rpc procedure name) and C<@arguments>
@@ -974,7 +1003,9 @@ sub findallitemid
   return @list;
 }
 
-=head2 $client-E<gt>send_flat_request( $procname, @arguments )
+=head2 send_flat_request
+
+ $client->send_flat_request( $procname, @arguments )
 
 Sends a low level request to the LiveJournal server using the flat API,
 with the given C<$procname> (the rpc procedure name) and C<@arguments>.
@@ -1031,7 +1062,9 @@ sub _clear_error
   undef $error;
 }
 
-=head2 $client-E<gt>error
+=head2 error
+
+ $client->error
 
 Returns the last error.  This just returns
 $WebService::LiveJournal::Client::error, so it
