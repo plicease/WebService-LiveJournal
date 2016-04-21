@@ -421,6 +421,7 @@ sub get_events
   return unless defined $response;
   if($selecttype eq 'one')
   {
+    return unless @{ $response->value->{events} } > 0;
     return new WebService::LiveJournal::Event(client => $self, %{ $response->value->{events}->[0] });
   }
   else

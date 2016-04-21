@@ -53,6 +53,10 @@ my $count = 0;
 my $last_sync = $client->sync_items(sub {
   my($action, $type, $id) = @_;
   note " item $action $type $id";
+  
+  my $event = $client->getevent(itemid => $id);
+  next unless $event;
+  
   $count++;
 });
 
