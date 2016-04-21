@@ -4,9 +4,10 @@ use Test::More;
 use WebService::LiveJournal;
 
 plan skip_all => 'for live tests set TEST_WEBSERVICE_LIVEJOURNAL' unless defined $ENV{TEST_WEBSERVICE_LIVEJOURNAL};
-plan tests => 5;
 
-my($user,$pass,$server) = split /:/, $ENV{TEST_WEBSERVICE_LIVEJOURNAL};
+my($user,$pass,$server,$type) = split /:/, $ENV{TEST_WEBSERVICE_LIVEJOURNAL};
+plan skip_all => 'test requires LJ (not DW) server' if defined $type && $type eq 'dw';
+plan tests => 5;
 
 my $client = WebService::LiveJournal->new(
   server => $server,
