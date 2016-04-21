@@ -55,7 +55,7 @@ my $last_sync = $client->sync_items(sub {
   note " item $action $type $id";
   
   my $event = $client->getevent(itemid => $id);
-  next unless $event;
+  return unless $event;
   
   $count++;
 });
