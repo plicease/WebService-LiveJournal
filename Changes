@@ -2,6 +2,9 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.08      2016-04-25 11:20:07 -0400
+  - Add some basic support for DreamWidth
+
 0.07      2014-01-08 08:26:17 -0500
   - month was off by one (gh#1)
 
