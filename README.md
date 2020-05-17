@@ -1,19 +1,23 @@
-# WebService::LiveJournal [![Build Status](https://secure.travis-ci.org/plicease/WebService-LiveJournal.png)](http://travis-ci.org/plicease/WebService-LiveJournal)
+# WebService::LiveJournal [![Build Status](https://travis-ci.org/plicease/WebService-LiveJournal.svg)](http://travis-ci.org/plicease/WebService-LiveJournal)
 
-Interface to the LiveJournal API
+(Deprecated) Interface to the LiveJournal API
 
 # SYNOPSIS
 
 new interface
 
-    use WebService::LiveJournal;
-    my $client = WebService::LiveJournal->new( username => 'foo', password => 'bar' );
+```perl
+use WebService::LiveJournal;
+my $client = WebService::LiveJournal->new( username => 'foo', password => 'bar' );
+```
 
 same thing with the old interface
 
-    use WebService::LiveJournal::Client;
-    my $client = WebService::LiveJournal::Client->new( username => 'foo', password => 'bar' );
-    die "connection error: $WebService::LiveJournal::Client::error" unless defined $client;
+```perl
+use WebService::LiveJournal::Client;
+my $client = WebService::LiveJournal::Client->new( username => 'foo', password => 'bar' );
+die "connection error: $WebService::LiveJournal::Client::error" unless defined $client;
+```
 
 See [WebService::LiveJournal::Event](https://metacpan.org/pod/WebService::LiveJournal::Event) for creating/updating LiveJournal events.
 
@@ -22,6 +26,11 @@ See [WebService::LiveJournal::Friend](https://metacpan.org/pod/WebService::LiveJ
 See [WebService::LiveJournal::FriendGroup](https://metacpan.org/pod/WebService::LiveJournal::FriendGroup) for getting your friend groups.
 
 # DESCRIPTION
+
+**NOTE**: This distribution is deprecated.  It uses the outmoded XML-RPC protocol.
+LiveJournal has also been compromised.  I recommend using DreamWidth instead
+([https://www.dreamwidth.org/](https://www.dreamwidth.org/)) which is in keeping with the original philosophy
+LiveJournal regarding advertising.
 
 This is a client class for communicating with LiveJournal using its API.  It is different
 from the other LJ modules on CPAN in that it originally used the XML-RPC API.  It now
@@ -44,7 +53,9 @@ It is recommended that for any new code that you use the new interface.
 
 ## new
 
-    my $client = WebService::LiveJournal::Client->new( %options )
+```perl
+my $client = WebService::LiveJournal::Client->new( %options )
+```
 
 Connects to a LiveJournal server using the host and user information
 provided by `%options`.
@@ -124,7 +135,9 @@ fast server mode.
 
 ## create\_event
 
-    $client->create_event( %options )
+```
+$client->create_event( %options )
+```
 
 Creates a new event and returns it in the form of an instance of
 [WebService::LiveJournal::Event](https://metacpan.org/pod/WebService::LiveJournal::Event).  This does not create the 
@@ -137,25 +150,31 @@ attributes are `subject` and `event`, though you may set these
 values after the event is created as long as you set them
 before you try to `update` the event.  Thus this:
 
-    my $event = $client->create(
-      subject => 'a new title',
-      event => 'some content',
-    );
-    $event->update;
+```perl
+my $event = $client->create(
+  subject => 'a new title',
+  event => 'some content',
+);
+$event->update;
+```
 
 is equivalent to this:
 
-    my $event = $client->create;
-    $event->subject('a new title');
-    $event->event('some content');
-    $event->update;
+```perl
+my $event = $client->create;
+$event->subject('a new title');
+$event->event('some content');
+$event->update;
+```
 
 This method signals an error depending on the interface
 selected by throwing an exception or returning undef.
 
 ## get\_events
 
-    $client->get_events( $select_type, %query )
+```
+$client->get_events( $select_type, %query )
+```
 
 Selects events from the LiveJournal server.  The actual `%query`
 parameter requirements depend on the `$select_type`.
@@ -205,7 +224,9 @@ selected by throwing an exception or returning undef.
 
 ## get\_event
 
-    $client->get_event( $itemid )
+```
+$client->get_event( $itemid )
+```
 
 Given an `itemid` (the internal LiveJournal identifier for an event).
 
@@ -214,15 +235,19 @@ selected by throwing an exception or returning undef.
 
 ## sync\_items
 
-    $client->sync_items( $cb )
-    $client->sync_items( last_sync => $time, $cb )
+```perl
+$client->sync_items( $cb )
+$client->sync_items( last_sync => $time, $cb )
+```
 
 Fetch all of the items which have been created/modified since the last sync.
 If `last_sync => $time` is not provided then it will fetch all events.
 For each item that has been changed it will call the code reference `$cb`
 with three arguments:
 
-    $cb->($action, $type, $id)
+```
+$cb->($action, $type, $id)
+```
 
 - action
 
@@ -248,27 +273,29 @@ changed since the first time.
 
 Here is a broad example:
 
-    # first time:
-    my $time = $client->sync_items(sub {
-      my($action, $type, $id) = @_;
-      if($type eq 'L')
-      {
-        my $event = $client->get_item($id);
-        # ...
-        if(error condition)
-        {
-          die 'error happened';
-        }
-      }
-    });
-    
-    # if an error happened during the sync
-    my $error = $client->error;
-    
-    # next time:
-    $time = $client->sync_items(last_sync => $time, sub {
-      ...
-    });
+```perl
+# first time:
+my $time = $client->sync_items(sub {
+  my($action, $type, $id) = @_;
+  if($type eq 'L')
+  {
+    my $event = $client->get_item($id);
+    # ...
+    if(error condition)
+    {
+      die 'error happened';
+    }
+  }
+});
+
+# if an error happened during the sync
+my $error = $client->error;
+
+# next time:
+$time = $client->sync_items(last_sync => $time, sub {
+  ...
+});
+```
 
 Because the `syncitems` rpc that this method depends on
 can make several requests before it completes it can fail
@@ -280,7 +307,9 @@ that `sync_item` completed without error because the
 
 ## get\_friends
 
-    $client->get_friends( %options )
+```
+$client->get_friends( %options )
+```
 
 Returns friend information associated with the account with which you are logged in.
 
@@ -288,15 +317,19 @@ Returns friend information associated with the account with which you are logged
 
     If true returns your friends, stalkers (users who have you as a friend) and friend groups
 
-        # $friends is a WS::LJ::FriendList containing your friends
-        # $friend_of is a WS::LJ::FriendList containing your stalkers
-        # $groups is a WS::LJ::FriendGroupList containing your friend groups
-        my($friends, $friend_of, $groups) = $client-E<gt>get_friends( complete => 1 );
+    ```perl
+    # $friends is a WS::LJ::FriendList containing your friends
+    # $friend_of is a WS::LJ::FriendList containing your stalkers
+    # $groups is a WS::LJ::FriendGroupList containing your friend groups
+    my($friends, $friend_of, $groups) = $client-E<gt>get_friends( complete => 1 );
+    ```
 
     If false (the default) only your friends will be returned
 
-        # $friends is a WS::LJ::FriendList containing your friends
-        my $friends = $client-E<gt>get_friends;
+    ```perl
+    # $friends is a WS::LJ::FriendList containing your friends
+    my $friends = $client-E<gt>get_friends;
+    ```
 
 - friendlimit
 
@@ -304,7 +337,9 @@ Returns friend information associated with the account with which you are logged
 
 ## get\_friends\_of
 
-    $client->get_friend_of( %options )
+```
+$client->get_friend_of( %options )
+```
 
 Returns the list of users that are a friend of the logged in account.
 
@@ -319,7 +354,9 @@ Options:
 
 ## get\_friend\_groups
 
-    $client->get_friend_groups
+```
+$client->get_friend_groups
+```
 
 Returns your friend groups.  This comes as an instance of
 [WebService::LiveJournal::FriendGroupList](https://metacpan.org/pod/WebService::LiveJournal::FriendGroupList) that contains
@@ -327,8 +364,10 @@ zero or more instances of [WebService::LiveJournal::FriendGroup](https://metacpa
 
 ## get\_user\_tags
 
-    $client->get_user_tags;
-    $client->get_user_tags( $journal_name );
+```perl
+$client->get_user_tags;
+$client->get_user_tags( $journal_name );
+```
 
 Fetch the tags associated with the given journal, or the users journal
 if not specified.  This method returns a list of zero or more
@@ -336,7 +375,9 @@ if not specified.  This method returns a list of zero or more
 
 ## console\_command
 
-    $client->console_command( $command, @arguments )
+```
+$client->console_command( $command, @arguments )
+```
 
 Execute the given console command with the given arguments on the
 LiveJournal server.  Returns the output as a list reference.
@@ -344,47 +385,59 @@ Each element in the list represents a line out output and consists
 of a list reference containing the type of output and the text
 of the output.  For example:
 
-    my $ret = $client->console_command( 'print', 'hello world' );
+```perl
+my $ret = $client->console_command( 'print', 'hello world' );
+```
 
 returns:
 
-    [
-      [ 'info',    "Welcome to 'print'!" ],
-      [ 'success', "hello world" ],
-    ]
+```
+[
+  [ 'info',    "Welcome to 'print'!" ],
+  [ 'success', "hello world" ],
+]
+```
 
 ## batch\_console\_commands
 
-    $client->batch_console_commands( $command1, $callback);
-    $client->batch_console_commands( $command1, $callback, [ $command2, $callback, [ ... ] );
+```
+$client->batch_console_commands( $command1, $callback);
+$client->batch_console_commands( $command1, $callback, [ $command2, $callback, [ ... ] );
+```
 
 Execute a list of commands on the LiveJournal server in one request. Each command is a list reference. Each callback 
 associated with each command will be called with the results of that command (in the same format returned by 
 `console_command` mentioned above, except it is passed in as a list instead of a list reference).  Example:
 
-    $client->batch_console_commands(
-      [ 'print', 'something to print' ],
-      sub {
-        my @output = @_;
-        ...
-      },
-      [ 'print', 'something else to print' ],
-      sub {
-        my @output = @_;
-        ...
-      },
-    );
+```perl
+$client->batch_console_commands(
+  [ 'print', 'something to print' ],
+  sub {
+    my @output = @_;
+    ...
+  },
+  [ 'print', 'something else to print' ],
+  sub {
+    my @output = @_;
+    ...
+  },
+);
+```
 
 ## set\_cookie
 
-    $client->set_cookie( $key => $value )
+```perl
+$client->set_cookie( $key => $value )
+```
 
 This method allows you to set a cookie for the appropriate security and expiration information.
 You shouldn't need to call it directly, but is available here if necessary.
 
 ## send\_request
 
-    $client->send_request( $procname, @arguments )
+```
+$client->send_request( $procname, @arguments )
+```
 
 Make a low level request to LiveJournal with the given
 `$procname` (the rpc procedure name) and `@arguments`
@@ -398,7 +451,9 @@ selected by throwing an exception or returning undef.
 
 ## send\_flat\_request
 
-    $client->send_flat_request( $procname, @arguments )
+```
+$client->send_flat_request( $procname, @arguments )
+```
 
 Sends a low level request to the LiveJournal server using the flat API,
 with the given `$procname` (the rpc procedure name) and `@arguments`.
@@ -410,13 +465,17 @@ selected by throwing an exception or returning undef.
 
 ## error
 
-    $client->error
+```
+$client->error
+```
 
 Returns the last error.  This just returns
 $WebService::LiveJournal::Client::error, so it
 is still a global, but is a slightly safer shortcut.
 
-    my $event = $client->get_event($itemid) || die $client->error;
+```perl
+my $event = $client->get_event($itemid) || die $client->error;
+```
 
 It is still better to use the newer interface which throws
 an exception for any error.
@@ -428,162 +487,170 @@ These examples are included with the distribution in its 'example' directory.
 Here is a simple example of how you would login/authenticate with a 
 LiveJournal server:
 
-    use strict;
-    use warnings;
-    use WebService::LiveJournal;
-    
-    print "user: ";
-    my $user = <STDIN>;
-    chomp $user;
-    print "pass: ";
-    my $password = <STDIN>;
-    chomp $password;
-    
-    my $client = WebService::LiveJournal->new(
-      server => 'www.livejournal.com',
-      username => $user,
-      password => $password,
-    );
-    
-    print "$client\n";
-    
-    if($client->fastserver)
-    {
-      print "fast server\n";
-    }
-    else
-    {
-      print "slow server\n";
-    }
+```perl
+use strict;
+use warnings;
+use WebService::LiveJournal;
+
+print "user: ";
+my $user = <STDIN>;
+chomp $user;
+print "pass: ";
+my $password = <STDIN>;
+chomp $password;
+
+my $client = WebService::LiveJournal->new(
+  server => 'www.livejournal.com',
+  username => $user,
+  password => $password,
+);
+
+print "$client\n";
+
+if($client->fastserver)
+{
+  print "fast server\n";
+}
+else
+{
+  print "slow server\n";
+}
+```
 
 Here is a simple example showing how you can post an entry to your 
 LiveJournal:
 
-    use strict;
-    use warnings;
-    use WebService::LiveJournal;
-    
-    print "user: ";
-    my $user = <STDIN>;
-    chomp $user;
-    print "pass: ";
-    my $password = <STDIN>;
-    chomp $password;
-    
-    my $client = WebService::LiveJournal->new(
-      server => 'www.livejournal.com',
-      username => $user,
-      password => $password,
-    );
-    
-    print "subject: ";
-    my $subject = <STDIN>;
-    chomp $subject;
-    
-    print "content: (^D or EOF when done)\n";
-    my @lines = <STDIN>;
-    chomp @lines;
-    
-    my $event = $client->create(
-      subject => $subject,
-      event => join("\n", @lines),
-    );
-    
-    $event->update;
-    
-    print "posted $event with $client\n";
-    print "itemid = ", $event->itemid, "\n";
-    print "url    = ", $event->url, "\n";
-    print "anum   = ", $event->anum, "\n";
+```perl
+use strict;
+use warnings;
+use WebService::LiveJournal;
+
+print "user: ";
+my $user = <STDIN>;
+chomp $user;
+print "pass: ";
+my $password = <STDIN>;
+chomp $password;
+
+my $client = WebService::LiveJournal->new(
+  server => 'www.livejournal.com',
+  username => $user,
+  password => $password,
+);
+
+print "subject: ";
+my $subject = <STDIN>;
+chomp $subject;
+
+print "content: (^D or EOF when done)\n";
+my @lines = <STDIN>;
+chomp @lines;
+
+my $event = $client->create(
+  subject => $subject,
+  event => join("\n", @lines),
+);
+
+$event->update;
+
+print "posted $event with $client\n";
+print "itemid = ", $event->itemid, "\n";
+print "url    = ", $event->url, "\n";
+print "anum   = ", $event->anum, "\n";
+```
 
 Here is an example of a script that will remove all entries from a 
 LiveJournal.  Be very cautious before using this script, once the 
 entries are removed they cannot be brought back from the dead:
 
-    use strict;
-    use warnings;
-    use WebService::LiveJournal;
-    
-    print "WARNING WARNING WARNING\n";
-    print "this will remove all entries in your LiveJournal account\n";
-    print "this probably cannot be undone\n";
-    print "WARNING WARNING WARNING\n";
-    
-    print "user: ";
-    my $user = <STDIN>;
-    chomp $user;
-    print "pass: ";
-    my $password = <STDIN>;
-    chomp $password;
-    
-    my $client = WebService::LiveJournal->new(
-      server => 'www.livejournal.com',
-      username => $user,
-      password => $password,
-    );
-    
-    print "$client\n";
-    
-    my $count = 0;
-    while(1)
-    {
-      my $event_list = $client->get_events('lastn', howmany => 50);
-      last unless @{ $event_list } > 0;
-      foreach my $event (@{ $event_list })
-      {
-        print "rm: ", $event->subject, "\n";
-        $event->delete;
-        $count++;
-      }
-    }
-    
-    print "$count entries deleted\n";
+```perl
+use strict;
+use warnings;
+use WebService::LiveJournal;
+
+print "WARNING WARNING WARNING\n";
+print "this will remove all entries in your LiveJournal account\n";
+print "this probably cannot be undone\n";
+print "WARNING WARNING WARNING\n";
+
+print "user: ";
+my $user = <STDIN>;
+chomp $user;
+print "pass: ";
+my $password = <STDIN>;
+chomp $password;
+
+my $client = WebService::LiveJournal->new(
+  server => 'www.livejournal.com',
+  username => $user,
+  password => $password,
+);
+
+print "$client\n";
+
+my $count = 0;
+while(1)
+{
+  my $event_list = $client->get_events('lastn', howmany => 50);
+  last unless @{ $event_list } > 0;
+  foreach my $event (@{ $event_list })
+  {
+    print "rm: ", $event->subject, "\n";
+    $event->delete;
+    $count++;
+  }
+}
+
+print "$count entries deleted\n";
+```
 
 Here is a really simple command line interface to the LiveJournal
 admin console.  Obvious improvements like better parsing of the commands
 and not displaying the password are left as an exercise to the reader.
 
-    use strict;
-    use warnings;
-    use WebService::LiveJournal;
-    
-    my $client = WebService::LiveJournal->new(
-      server => 'www.livejournal.com',
-      username => do {
-        print "user: ";
-        my $user = <STDIN>;
-        chomp $user;
-        $user;
-      },
-      password => do {
-        print "pass: ";
-        my $pass = <STDIN>;
-        chomp $pass;
-        $pass;
-      },
-    );
-    
-    while(1)
-    {
-      print "> ";
-      my $command = <STDIN>;
-      unless(defined $command)
+```perl
+use strict;
+use warnings;
+use WebService::LiveJournal;
+
+my $client = WebService::LiveJournal->new(
+  server => 'www.livejournal.com',
+  username => do {
+    print "user: ";
+    my $user = <STDIN>;
+    chomp $user;
+    $user;
+  },
+  password => do {
+    print "pass: ";
+    my $pass = <STDIN>;
+    chomp $pass;
+    $pass;
+  },
+);
+
+while(1)
+{
+  print "> ";
+  my $command = <STDIN>;
+  unless(defined $command)
+  {
+    print "\n";
+    last;
+  }
+  chomp $command;
+  $client->batch_console_commands(
+    [ split /\s+/, $command ],
+    sub {
+      foreach my $line (@_)
       {
-        print "\n";
-        last;
+        my($type, $text) = @$line;
+        printf "%8s : %s\n", $type, $text;
       }
-      chomp $command;
-      $client->batch_console_commands(
-        [ split /\s+/, $command ],
-        sub {
-          foreach my $line (@_)
-          {
-            my($type, $text) = @$line;
-            printf "%8s : %s\n", $type, $text;
-          }
-        }
-      );
     }
+  );
+}
+```
 
 # HISTORY
 

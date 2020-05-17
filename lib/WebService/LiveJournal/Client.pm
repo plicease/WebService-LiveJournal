@@ -14,7 +14,7 @@ use WebService::LiveJournal::EventList;
 use WebService::LiveJournal::Tag;
 use HTTP::Cookies;
 
-# ABSTRACT: Interface to the LiveJournal API
+# ABSTRACT: (Deprecated) Interface to the LiveJournal API
 # VERSION
 
 =head1 SYNOPSIS
@@ -37,6 +37,11 @@ See L<WebService::LiveJournal::Friend> for making queries about friends.
 See L<WebService::LiveJournal::FriendGroup> for getting your friend groups.
 
 =head1 DESCRIPTION
+
+B<NOTE>: This distribution is deprecated.  It uses the outmoded XML-RPC protocol.
+LiveJournal has also been compromised.  I recommend using DreamWidth instead
+(L<https://www.dreamwidth.org/>) which is in keeping with the original philosophy
+LiveJournal regarding advertising.
 
 This is a client class for communicating with LiveJournal using its API.  It is different
 from the other LJ modules on CPAN in that it originally used the XML-RPC API.  It now

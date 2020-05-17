@@ -5,7 +5,7 @@ use warnings;
 use v5.10;
 use base qw( WebService::LiveJournal::Client );
 
-# ABSTRACT: Interface to the LiveJournal API
+# ABSTRACT: (Deprecated) Interface to the LiveJournal API
 # VERSION
 
 sub _set_error

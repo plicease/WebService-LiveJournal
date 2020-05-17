@@ -6,10 +6,15 @@ use WebService::LiveJournal::List;
 use WebService::LiveJournal::Friend;
 our @ISA = qw/ WebService::LiveJournal::List /;
 
-# ABSTRACT: List of LiveJournal friends
+# ABSTRACT: (Deprecated) List of LiveJournal friends
 # VERSION
 
 =head1 DESCRIPTION
+
+B<NOTE>: This distribution is deprecated.  It uses the outmoded XML-RPC protocol.
+LiveJournal has also been compromised.  I recommend using DreamWidth instead
+(L<https://www.dreamwidth.org/>) which is in keeping with the original philosophy
+LiveJournal regarding advertising.
 
 List of friends returned from L<WebService::LiveJournal>.
 See L<WebService::LiveJournal::Friend> for how to use

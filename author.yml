@@ -38,6 +38,7 @@ pod_spelling_system:
     - group1
     - group2
     - S2
+    - DreamWidth
 
 pod_coverage:
   # format is "Class#method" or "Class", regex allowed

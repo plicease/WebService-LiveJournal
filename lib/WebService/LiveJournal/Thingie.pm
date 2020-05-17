@@ -4,8 +4,17 @@ use strict;
 use warnings;
 use overload '""' => sub { $_[0]->as_string };
 
-# ABSTRACT: base class for WebService::LiveJournal classes
+# ABSTRACT: (Deprecated) base class for WebService::LiveJournal classes
 # VERSION
+
+=head1 DESCRIPTION
+
+B<NOTE>: This distribution is deprecated.  It uses the outmoded XML-RPC protocol.
+LiveJournal has also been compromised.  I recommend using DreamWidth instead
+(L<https://www.dreamwidth.org/>) which is in keeping with the original philosophy
+LiveJournal regarding advertising.
+
+=cut
 
 sub client
 {
