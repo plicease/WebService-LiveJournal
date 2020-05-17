@@ -1,6 +1,6 @@
 # WebService::LiveJournal [![Build Status](https://travis-ci.org/plicease/WebService-LiveJournal.svg)](http://travis-ci.org/plicease/WebService-LiveJournal)
 
-Interface to the LiveJournal API
+(Deprecated) Interface to the LiveJournal API
 
 # SYNOPSIS
 
@@ -26,6 +26,11 @@ See [WebService::LiveJournal::Friend](https://metacpan.org/pod/WebService::LiveJ
 See [WebService::LiveJournal::FriendGroup](https://metacpan.org/pod/WebService::LiveJournal::FriendGroup) for getting your friend groups.
 
 # DESCRIPTION
+
+**NOTE**: This distribution is deprecated.  It uses the outmoded XML-RPC protocol.
+LiveJournal has also been compromised.  I recommend using DreamWidth instead
+([https://www.dreamwidth.org/](https://www.dreamwidth.org/)) which is in keeping with the original philosophy
+LiveJournal regarding advertising.
 
 This is a client class for communicating with LiveJournal using its API.  It is different
 from the other LJ modules on CPAN in that it originally used the XML-RPC API.  It now

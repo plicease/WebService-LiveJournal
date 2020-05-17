@@ -5,7 +5,7 @@ use warnings;
 use WebService::LiveJournal::Thingie;
 our @ISA = qw/ WebService::LiveJournal::Thingie /;
 
-# ABSTRACT: LiveJournal friend class
+# ABSTRACT: (Deprecated) LiveJournal friend class
 # VERSION
 
 =head1 SYNOPSIS
@@ -31,6 +31,11 @@ our @ISA = qw/ WebService::LiveJournal::Thingie /;
  }
 
 =head1 DESCRIPTION
+
+B<NOTE>: This distribution is deprecated.  It uses the outmoded XML-RPC protocol.
+LiveJournal has also been compromised.  I recommend using DreamWidth instead
+(L<https://www.dreamwidth.org/>) which is in keeping with the original philosophy
+LiveJournal regarding advertising.
 
 This class represents a friend or user on the LiveJournal server.
 

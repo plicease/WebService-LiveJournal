@@ -6,7 +6,7 @@ use RPC::XML;
 use WebService::LiveJournal::Thingie;
 our @ISA = qw/ WebService::LiveJournal::Thingie /;
 
-# ABSTRACT: LiveJournal event class
+# ABSTRACT: (Deprecated) LiveJournal event class
 # VERSION
 
 =head1 SYNOPSIS
@@ -44,6 +44,11 @@ update an existing event
         
 
 =head1 DESCRIPTION
+
+B<NOTE>: This distribution is deprecated.  It uses the outmoded XML-RPC protocol.
+LiveJournal has also been compromised.  I recommend using DreamWidth instead
+(L<https://www.dreamwidth.org/>) which is in keeping with the original philosophy
+LiveJournal regarding advertising.
 
 This class represents an "event" on the LiveJournal server.
 

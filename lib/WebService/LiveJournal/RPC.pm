@@ -9,8 +9,17 @@ use RPC::XML::Client;
 our @ISA = qw/ Exporter /;
 our @EXPORT_OK = qw/ xml2hashref xml2hash /;
 
-# ABSTRACT: RPC utilities for WebService::LiveJournal
+# ABSTRACT: (Deprecated) RPC utilities for WebService::LiveJournal
 # VERSION
+
+=head1 DESCRIPTION
+
+B<NOTE>: This distribution is deprecated.  It uses the outmoded XML-RPC protocol.
+LiveJournal has also been compromised.  I recommend using DreamWidth instead
+(L<https://www.dreamwidth.org/>) which is in keeping with the original philosophy
+LiveJournal regarding advertising.
+
+=cut
 
 my $parser = new RPC::XML::ParserFactory;
 
