@@ -6,6 +6,10 @@ install:
 
 script: HARNESS_IS_VERBOSE=1 prove -lvr t
 
+branches:
+  only:
+    - master
+
 perl:
   - "5.26"
   - "5.24"
